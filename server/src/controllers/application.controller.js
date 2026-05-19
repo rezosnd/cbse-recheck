@@ -11,7 +11,8 @@ const razorpay = new Razorpay({
 
 // Calculate price based on subject count
 const calculatePrice = (subjectCount) => {
-  return 1;
+  const pricePerSubject = Number(process.env.PRICE_PER_SUBJECT) || 499;
+  return subjectCount * pricePerSubject;
 };
 
 // POST /api/applications – Create application & Razorpay order
