@@ -236,6 +236,7 @@ exports.uploadFiles = async (req, res) => {
       fileUrl: file.path || file.secure_url,
       publicId: file.filename || file.public_id,
       fileName: file.originalname,
+      subject: req.body.subject,
     }));
 
     application.uploadedFiles.push(...newFiles);

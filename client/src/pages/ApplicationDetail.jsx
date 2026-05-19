@@ -14,7 +14,8 @@ const ApplicationDetail = () => {
   const { id } = useParams();
   const [app, setApp] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const [activeSubject, setActiveSubject] = useState(null);
+  const [uploadingSubject, setUploadingSubject] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -32,51 +33,34 @@ const ApplicationDetail = () => {
     }
   };
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = async (e, subjectName) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    const existingCount = app.uploadedFiles?.length || 0;
-    const requiredCount = app.subjects.length;
-    const needed = requiredCount - existingCount;
-
-    if (existingCount >= requiredCount) {
-      toast.error('You have already uploaded all required documents.');
+    const file = files[0];
+    if (file.size > 10 * 1024 * 1024) {
       if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
+      return toast.error('File size is larger than 10MB');
     }
-
-    if (files.length !== needed) {
-      toast.error(`Please select exactly ${needed} document(s) (one for each remaining subject).`);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
-    const validFiles = files.filter(f => {
-      if (f.size > 10 * 1024 * 1024) {
-        toast.error(`${f.name} is larger than 10MB`);
-        return false;
-      }
-      return true;
-    });
-
-    if (!validFiles.length) return;
 
     const formData = new FormData();
-    validFiles.forEach(file => formData.append('files', file));
+    formData.append('files', file);
     formData.append('fileType', 'answerSheet');
+    if (subjectName) {
+      formData.append('subject', subjectName);
+    }
 
-    setUploading(true);
+    setUploadingSubject(subjectName);
     try {
       await api.post(`/applications/${id}/upload-files`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('Files uploaded successfully');
+      toast.success(`${subjectName} answer sheet uploaded successfully`);
       fetchApplication();
     } catch (err) {
-      toast.error('Failed to upload files');
+      toast.error('Failed to upload file');
     } finally {
-      setUploading(false);
+      setUploadingSubject(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -193,29 +177,10 @@ const ApplicationDetail = () => {
           <div className="space-y-6">
             
             {/* Upload Section */}
+            {/* Upload Section */}
             <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-5">Documents</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-5">Answer Sheets</h3>
               
-              <div className="space-y-3 mb-6">
-                {app.uploadedFiles?.map(file => (
-                  <div key={file._id} className="flex items-center justify-between p-3.5 rounded-2xl border border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <FiFileText size={18} className="text-blue-600 shrink-0" />
-                      <span className="text-[13px] truncate font-semibold text-gray-700">{file.fileName}</span>
-                    </div>
-                    <button onClick={() => handleDownload(file.fileUrl, file.fileName)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
-                      <FiDownload size={16} />
-                    </button>
-                  </div>
-                ))}
-                
-                {(!app.uploadedFiles || app.uploadedFiles.length === 0) && (
-                  <div className="text-[13px] text-center py-6 rounded-2xl border border-dashed border-gray-200 text-gray-400 font-medium">
-                    No documents uploaded yet
-                  </div>
-                )}
-              </div>
-
               {app.status === 'submitted' && (
                 <div className="text-center py-6 px-4 bg-red-50 border border-red-100 rounded-2xl">
                   <p className="text-[13px] font-semibold text-red-600 mb-1">Payment Required</p>
@@ -223,24 +188,83 @@ const ApplicationDetail = () => {
                 </div>
               )}
 
-              {app.status !== 'submitted' && app.status !== 'completed' && app.status !== 'rejected' && (
-                <>
-                  <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
-                  <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="w-full py-3.5 rounded-full bg-black text-white text-[13px] font-semibold hover:bg-gray-800 transition-colors flex justify-center items-center gap-2 shadow-sm disabled:opacity-70"
-                  >
-                    {uploading ? (
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    ) : <FiUploadCloud size={18} />}
-                    {uploading ? 'Uploading...' : 'Upload Answer Sheets'}
-                  </button>
-                  <p className="text-[11px] text-center mt-3 text-gray-400 font-medium">Max size: 10MB. Formats: PDF, JPG, PNG</p>
-                </>
+              {app.status !== 'submitted' && (
+                <div className="space-y-4">
+                  {app.subjects.map((sub, index) => {
+                    // Match file by explicit subject name, or fallback to index matching for older files
+                    let file = app.uploadedFiles?.find(f => f.subject === sub.subject);
+                    if (!file && app.uploadedFiles && app.uploadedFiles[index]) {
+                      file = app.uploadedFiles[index];
+                    }
+                    const isUploading = uploadingSubject === sub.subject;
+                    
+                    return (
+                      <div key={index} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[13px] font-bold text-gray-900 truncate pr-2" title={sub.subject}>
+                            {sub.subject}
+                          </span>
+                          {file ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full shrink-0">
+                              ✓ Uploaded
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full shrink-0">
+                              ⚠️ Pending
+                            </span>
+                          )}
+                        </div>
+                        
+                        {file ? (
+                          <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-gray-100">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <FiFileText size={16} className="text-blue-600 shrink-0" />
+                              <span className="text-[12px] truncate font-medium text-gray-600">{file.fileName}</span>
+                            </div>
+                            <button 
+                              onClick={() => handleDownload(file.fileUrl, file.fileName)} 
+                              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
+                              title="Download Answer Sheet"
+                            >
+                              <FiDownload size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          app.status !== 'completed' && app.status !== 'rejected' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveSubject(sub.subject);
+                                setTimeout(() => {
+                                  fileInputRef.current?.click();
+                                }, 50);
+                              }}
+                              disabled={uploadingSubject !== null}
+                              className="w-full py-2.5 rounded-xl bg-black text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors flex justify-center items-center gap-1.5 disabled:opacity-50"
+                            >
+                              {isUploading ? (
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              ) : <FiUploadCloud size={16} />}
+                              {isUploading ? 'Uploading...' : `Upload Answer Sheet`}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
+                  
+                  <input 
+                    type="file" 
+                    accept=".pdf,.jpg,.jpeg,.png" 
+                    className="hidden" 
+                    ref={fileInputRef} 
+                    onChange={(e) => handleFileUpload(e, activeSubject)} 
+                  />
+                  <p className="text-[11px] text-center text-gray-400 font-medium pt-2">Max size: 10MB per file. Formats: PDF, JPG, PNG</p>
+                </div>
               )}
             </div>
 

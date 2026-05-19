@@ -44,6 +44,7 @@ const applicationSchema = new mongoose.Schema({
     fileUrl: { type: String, required: true },
     publicId: { type: String },
     fileName: { type: String },
+    subject: { type: String },
     uploadedAt: { type: Date, default: Date.now },
   }],
   paymentAmount: { type: Number, default: 0 },
