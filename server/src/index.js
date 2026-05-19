@@ -57,7 +57,9 @@ app.use(cors({
     if (
       cleanOrigins.includes(cleanOrigin) ||
       /^https?:\/\/localhost(:\d+)?$/.test(cleanOrigin) ||
-      /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(cleanOrigin)
+      /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(cleanOrigin) ||
+      /\.vercel\.app$/.test(cleanOrigin) ||
+      /veritasco\.tech$/.test(cleanOrigin)
     ) {
       callback(null, true);
     } else {
