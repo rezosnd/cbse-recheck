@@ -92,7 +92,7 @@ const emailTemplates = {
         </div>
         <div style="padding:40px 32px;">
           <h2 style="color:#1e293b;">Hi ${name},</h2>
-          <p style="color:#64748b;line-height:1.6;">Your evaluation is done! You can now check it on <a href="https://cbse.veritasco.tech" style="color:#3b82f6;text-decoration:none;">cbse.veritasco.tech</a>.</p>
+          <p style="color:#64748b;line-height:1.6;">Your evaluation is done! You can now check it on <a href="https://recheck.veritasco.tech" style="color:#3b82f6;text-decoration:none;">recheck.veritasco.tech</a>.</p>
           <p style="color:#64748b;">Please login to your dashboard to view the detailed recommendation for application <strong>${requestId}</strong>.</p>
           <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:24px;">This platform is not affiliated with CBSE. Educational guidance only.<br>For any queries contact on info@veritasco.tech</p>
         </div>
@@ -112,7 +112,7 @@ const emailTemplates = {
           <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:4px;padding:20px;margin:24px 0;">
             <p style="color:#1e293b;margin:0;line-height:1.6;">${messageContent}</p>
           </div>
-          <p style="color:#64748b;">Please login to your dashboard on <a href="https://cbse.veritasco.tech" style="color:#3b82f6;text-decoration:none;">cbse.veritasco.tech</a> to reply.</p>
+          <p style="color:#64748b;">Please login to your dashboard on <a href="https://recheck.veritasco.tech" style="color:#3b82f6;text-decoration:none;">recheck.veritasco.tech</a> to reply.</p>
           <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:24px;">This platform is not affiliated with CBSE. Educational guidance only.<br>For any queries contact on info@veritasco.tech</p>
         </div>
       </div>
