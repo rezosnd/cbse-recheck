@@ -233,25 +233,54 @@ const AdminApplicationDetail = () => {
             <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100">
               <h2 className="text-lg font-bold text-gray-900 mb-6">Uploaded Documents</h2>
               
-              {app.uploadedFiles?.length > 0 ? (
-                <div className="space-y-3">
-                  {app.uploadedFiles.map(file => (
-                    <div key={file._id} className="flex items-center justify-between p-3.5 rounded-2xl border border-gray-100 bg-gray-50/50">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <FiFileText size={18} className="text-blue-600 shrink-0" />
-                        <span className="text-[13px] truncate font-semibold text-gray-700">{file.fileName}</span>
+              <div className="space-y-4">
+                {app.subjects.map((sub, index) => {
+                  // Match file by explicit subject name, or fallback to index matching for older files
+                  let file = app.uploadedFiles?.find(f => f.subject === sub.subject);
+                  if (!file && app.uploadedFiles && app.uploadedFiles[index]) {
+                    file = app.uploadedFiles[index];
+                  }
+                  
+                  return (
+                    <div key={index} className="p-4 rounded-2xl border border-gray-100 bg-gray-50/50 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-gray-900 truncate pr-2" title={sub.subject}>
+                          {sub.subject}
+                        </span>
+                        {file ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full shrink-0">
+                            ✓ Uploaded
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full shrink-0">
+                            Pending
+                          </span>
+                        )}
                       </div>
-                      <button onClick={() => handleDownload(file.fileUrl, file.fileName)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
-                        <FiDownload size={16} />
-                      </button>
+                      
+                      {file ? (
+                        <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-gray-100">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <FiFileText size={16} className="text-blue-600 shrink-0" />
+                            <span className="text-[12px] truncate font-medium text-gray-600">{file.fileName}</span>
+                          </div>
+                          <button 
+                            onClick={() => handleDownload(file.fileUrl, file.fileName)} 
+                            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
+                            title="Download Answer Sheet"
+                          >
+                            <FiDownload size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-[12px] text-gray-400 font-medium italic pl-1">
+                          No file uploaded yet for this subject.
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-[13px] text-center py-8 rounded-2xl border border-dashed border-gray-200 text-gray-400 font-medium">
-                  No documents uploaded by the student yet.
-                </div>
-              )}
+                  );
+                })}
+              </div>
             </div>
 
           </div>
