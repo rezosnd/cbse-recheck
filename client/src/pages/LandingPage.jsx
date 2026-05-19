@@ -128,10 +128,9 @@ const Hero = () => (
             </Link>
           </motion.div>
 
-          {/* Premium trust badges, stars, and real-time active indicators */}
           <motion.div 
             variants={fadeUp} 
-            className="mt-8 p-5 rounded-[24px] bg-white/70 dark:bg-slate-900/40 border border-black/[0.03] dark:border-white/[0.03] backdrop-blur-md max-w-lg mx-auto lg:mx-0 shadow-[0_12px_40px_rgba(0,0,0,0.01)] flex flex-col gap-4"
+            className="hidden sm:flex mt-8 p-5 rounded-[24px] bg-white/70 dark:bg-slate-900/40 border border-black/[0.03] dark:border-white/[0.03] backdrop-blur-md max-w-lg mx-auto lg:mx-0 shadow-[0_12px_40px_rgba(0,0,0,0.01)] flex-col gap-4"
           >
             {/* Top row with tags */}
             <div className="flex items-center justify-between border-b border-black/[0.03] dark:border-white/[0.03] pb-3">

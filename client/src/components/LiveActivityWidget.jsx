@@ -113,7 +113,7 @@ const LiveActivityWidget = () => {
   const current = activities[currentIndex];
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 pointer-events-none max-w-sm w-[90vw] sm:w-[350px]">
+    <div className="hidden sm:block fixed bottom-6 left-6 z-50 pointer-events-none max-w-sm w-[350px]">
       <AnimatePresence>
         {isVisible && (
           <motion.div
