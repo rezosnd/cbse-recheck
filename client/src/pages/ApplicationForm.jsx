@@ -231,8 +231,10 @@ const SubjectSearchSelect = ({ value, onChange }) => {
 };
 
 const calculatePrice = (count) => {
-  const pricePerSubject = Number(import.meta.env.VITE_PRICE_PER_SUBJECT) || 499;
-  return count * pricePerSubject;
+  if (count === 1) return 29;
+  if (count === 2) return 40;
+  if (count >= 3) return 49;
+  return 0;
 };
 
 const ApplicationForm = () => {
