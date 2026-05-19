@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /auth
+Disallow: /admin/
+Disallow: /application/
+Disallow: /messages/
+Disallow: /dashboard/
+
+Sitemap: https://cbserecheck.com/sitemap.xml
