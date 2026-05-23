@@ -6,4 +6,4 @@ Disallow: /application/
 Disallow: /messages/
 Disallow: /dashboard/
 
-Sitemap: https://cbserecheck.com/sitemap.xml
+Sitemap: https://recheck.veritasco.tech/sitemap.xml
