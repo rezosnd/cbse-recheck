@@ -26,7 +26,7 @@ An enterprise-grade educational guidance web application designed to help CBSE C
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-* Node.js (v18+)
+* Node.js (v18)
 * MongoDB Atlas Cluster
 
 ### 2. Local Setup
