@@ -18,6 +18,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import PageLoader from './components/PageLoader';
+import CustomCursor from './components/CustomCursor';
 
 const App = () => {
   const { loading, darkMode } = useAuth();
@@ -26,6 +27,7 @@ const App = () => {
 
   return (
     <>
+      <CustomCursor />
       <Toaster
         position="top-right"
         toastOptions={{

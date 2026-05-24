@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
@@ -19,7 +19,7 @@ const stagger = {
   show: { transition: { staggerChildren: 0.12 } },
 };
 
-// ─── Hero Section ──────────────────────────────────────────────────────────────
+// --- Hero Section --------------------------------------------------------------
 const Hero = () => (
   <section className="min-h-screen relative overflow-hidden pt-32 pb-20 flex items-center bg-[#F5F5F5]">
     <div className="container-max w-full">
@@ -128,67 +128,44 @@ const Hero = () => (
             </Link>
           </motion.div>
 
-          <motion.div 
-            variants={fadeUp} 
-            className="hidden sm:flex mt-8 p-5 rounded-[24px] bg-white/70 dark:bg-slate-900/40 border border-black/[0.03] dark:border-white/[0.03] backdrop-blur-md max-w-lg mx-auto lg:mx-0 shadow-[0_12px_40px_rgba(0,0,0,0.01)] flex-col gap-4"
-          >
-            {/* Top row with tags */}
-            <div className="flex items-center justify-between border-b border-black/[0.03] dark:border-white/[0.03] pb-3">
-              {/* Pulse Indicator badge */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-extrabold tracking-wider uppercase">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                </span>
-                Live Activity
-              </div>
-              {/* Star Rating Badge */}
-              <div className="flex items-center gap-1">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 ml-1">4.9/5 Student Rating</span>
-              </div>
+          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-sm font-medium text-gray-500">
+
+            {/* Secure Uploads */}
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Secure Uploads
             </div>
 
-            {/* Bottom row with avatar stack & copy */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              {/* Avatar Stack */}
-              <div className="flex -space-x-3 shrink-0 mt-0.5">
-                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 bg-gradient-to-tr from-pink-500/10 to-rose-400/10 text-rose-600 dark:text-rose-400 border border-black/5 dark:border-white/5 flex items-center justify-center text-[10px] font-extrabold shadow-sm select-none">AM</div>
-                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 bg-gradient-to-tr from-blue-600/10 to-cyan-400/10 text-blue-600 dark:text-cyan-400 border border-black/5 dark:border-white/5 flex items-center justify-center text-[10px] font-extrabold shadow-sm select-none">SK</div>
-                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 bg-gradient-to-tr from-amber-500/10 to-yellow-400/10 text-amber-600 dark:text-amber-400 border border-black/5 dark:border-white/5 flex items-center justify-center text-[10px] font-extrabold shadow-sm select-none">RN</div>
-                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 bg-gradient-to-tr from-emerald-500/10 to-teal-400/10 text-emerald-600 dark:text-emerald-400 border border-black/5 dark:border-white/5 flex items-center justify-center text-[10px] font-extrabold shadow-sm select-none">AR</div>
-                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 bg-slate-900 dark:bg-slate-800 text-yellow-400 flex items-center justify-center text-[9px] font-black shadow-sm select-none">100+</div>
-              </div>
+            {/* Top Educators */}
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c0 2 6 3 6 3s6-1 6-3v-5"/>
+              </svg>
+              Checked by Top Educators
+            </div>
 
-              {/* Trust and Activity Info */}
-              <div className="text-center sm:text-left">
-                <p className="text-[12.5px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Join <span className="text-slate-900 dark:text-white font-extrabold border-b border-dashed border-red-500/40 pb-0.5">100+ verified students</span> who already upgraded to our premium senior educator evaluation path.
-                </p>
-              </div>
+            {/* Genuine Review */}
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+              100% Genuine Review
             </div>
-          </motion.div>
-          
-          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm font-medium text-gray-500">
 
+            {/* Razorpay Protected */}
             <div className="flex items-center gap-2">
-              <FiShield className="text-green-500" /> Secure Uploads
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Razorpay Protected
             </div>
-            <div className="flex items-center gap-2">
-              <FiAward className="text-yellow-600" /> Checked by Top Educators
-            </div>
-            <div className="flex items-center gap-2">
-              <FiCheckCircle className="text-purple-500" /> 100% Genuine Review
-            </div>
-            <div className="flex items-center gap-2">
-              <FiLock className="text-gray-900" /> Razorpay Protected
-            </div>
+
+
           </motion.div>
         </motion.div>
 
@@ -212,7 +189,7 @@ const Hero = () => (
                   <FiFileText size={22} className="text-yellow-600" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 leading-tight">Physics — Class 12</div>
+                  <div className="font-semibold text-gray-900 leading-tight">Physics -- Class 12</div>
                   <div className="text-[13px] text-gray-500 font-medium">CBSE 2027</div>
                 </div>
               </div>
@@ -323,7 +300,7 @@ const Hero = () => (
   </section>
 );
 
-// ─── How It Works ──────────────────────────────────────────────────────────────
+// --- How It Works --------------------------------------------------------------
 const steps = [
   { step: '01', title: 'Submit Details', desc: 'Enter your marks and upload answer sheets securely.' },
   { step: '02', title: 'Expert Analysis', desc: 'Our experienced CBSE evaluators review your paper.' },
@@ -401,7 +378,51 @@ const HowItWorks = () => (
   </section>
 );
 
-// ─── Features ─────────────────────────────────────────────────────────────────
+// --- Mid Statement Divider ---------------------------------------------------
+const MidStatement = ({ text, accent, stats }) => (
+  <div className="relative overflow-hidden bg-[#F5F5F5] py-16 md:py-20">
+    {/* Subtle dot-grid background */}
+    <div aria-hidden="true" style={{
+      position: 'absolute', inset: 0, zIndex: 0,
+      backgroundImage: 'radial-gradient(circle, #d1d5db 1px, transparent 1px)',
+      backgroundSize: '28px 28px',
+      opacity: 0.45,
+    }} />
+    {/* Gradient fade edges */}
+    <div aria-hidden="true" className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#F5F5F5] to-transparent z-10" />
+    <div aria-hidden="true" className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#F5F5F5] to-transparent z-10" />
+
+    <div className="container-max relative z-20 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+      {/* Large statement */}
+      <motion.p
+        initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }} transition={{ duration: 0.6 }}
+        style={{ fontFamily: 'Caveat, cursive', fontSize: 'clamp(2rem,5vw,3.4rem)', fontWeight: 700, lineHeight: 1.2, color: '#111827', maxWidth: '560px' }}
+      >
+        {text}{' '}
+        <span style={{ color: '#2563eb' }}>{accent}</span>
+      </motion.p>
+
+      {/* Inline stat pills */}
+      {stats && (
+        <motion.div
+          initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.15 }}
+          className="flex flex-wrap gap-4 md:flex-col md:items-end shrink-0"
+        >
+          {stats.map(s => (
+            <div key={s.label} className="flex flex-col items-center md:items-end">
+              <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.6rem)', color: '#111827', lineHeight: 1 }}>{s.value}</span>
+              <span className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider">{s.label}</span>
+            </div>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  </div>
+);
+
+// --- Features -----------------------------------------------------------------
 const features = [
   { icon: FiCheckCircle, title: 'Accurate Analysis', desc: 'Subject-wise mark analysis with step-by-step reasoning.' },
   { icon: FiShield, title: 'Honest Recommendations', desc: 'We tell you the truth, even if it means not applying.' },
@@ -435,7 +456,7 @@ const Features = () => (
   </section>
 );
 
-// ─── Pricing ──────────────────────────────────────────────────────────────────
+// --- Pricing ------------------------------------------------------------------
 const plans = [
   { subjects: 1, price: 29, label: '1 Subject' },
   { subjects: 2, price: 40, label: '2 Subjects', popular: true },
@@ -488,7 +509,7 @@ const Pricing = () => (
   </section>
 );
 
-// ─── FAQ ──────────────────────────────────────────────────────────────────────
+// --- FAQ ----------------------------------------------------------------------
 const faqs = [
   { q: 'Is this affiliated with CBSE?', a: 'No. This is an independent educational guidance platform providing expert analysis.' },
   { q: 'Can marks decrease?', a: 'Yes, in official CBSE re-evaluation marks can decrease. This is why our analysis helps you decide if the risk is worth it.' },
@@ -529,95 +550,294 @@ const FAQ = () => {
   );
 };
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
-const Footer = () => (
-  <footer className="pt-24 pb-12 bg-white border-t border-gray-100">
-    <div className="container-max max-w-6xl">
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-        <div className="lg:col-span-2">
-          <div className="flex items-center gap-3 mb-6">
-            <img src="/veritasco.png" alt="Veritasco" className="w-10 h-10 object-contain" />
-            <h3 className="text-xl font-bold text-gray-900 font-outfit">Veritasco Recheck</h3>
-          </div>
-          <p className="text-[15px] text-gray-500 mb-6 max-w-md leading-relaxed">
-            Need assistance regarding CBSE re-evaluation guidance? <br/>We’re here to help.
-          </p>
-          <div className="space-y-4">
-            <div>
-              <div className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Email Support</div>
-              <a href="mailto:info@veritasco.tech" className="text-[15px] font-medium text-gray-900 hover:text-blue-600 transition-colors">info@veritasco.tech</a>
+// --- Premium Ouro-style Footer w/ Magnetic Letter Physics --------------------
+const OuroFooter = () => {
+  const [hov, setHov] = useState(null);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+
+  // 9 letter refs: V E R i T a s C o -- must be declared individually (Rules of Hooks)
+  const r0 = useRef(null), r1 = useRef(null), r2 = useRef(null);
+  const r3 = useRef(null), r4 = useRef(null), r5 = useRef(null);
+  const r6 = useRef(null), r7 = useRef(null), r8 = useRef(null);
+  const letterRefs = [r0, r1, r2, r3, r4, r5, r6, r7, r8];
+  const mouse = useRef({ x: 0, y: 0 });
+  const springs = useRef(Array.from({ length: 9 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })));
+  const rafId = useRef(null);
+  const svgRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fontSizeRef = useRef(null); // cached computed font size for canvas glyph draw
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const STIFFNESS = 0.055;  // spring acceleration (lower = slower, more elastic)
+    const DAMPING   = 0.62;   // velocity retention (lower = more bounce)
+    const RADIUS    = 420;    // px -- huge influence zone like Ouro Labs
+    const STRENGTH  = 1.9;    // displacement multiplier -- very strong pull
+    const MAX_DISP  = 85;     // cap so letters don't fly off screen
+
+    const onMouseMove = (e) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', onMouseMove);
+
+    const tick = () => {
+      letterRefs.forEach((ref, i) => {
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        // Use center of the bounding box (works correctly on SVG <g> elements)
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top  + rect.height / 2;
+        const dx = mouse.current.x - cx;
+        const dy = mouse.current.y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const sp = springs.current[i];
+
+        let targetX = 0, targetY = 0;
+        if (dist < RADIUS && dist > 1) {
+          // Smoothstep ease -- strongest near cursor, tapers at radius edge
+          const normalized = 1 - dist / RADIUS;
+          const eased = normalized * normalized * (3 - 2 * normalized);
+          const force = eased * STRENGTH;
+          // Negate: letters REPEL away from cursor (opposite of attraction)
+          targetX = Math.max(-MAX_DISP, Math.min(MAX_DISP, -dx * force));
+          targetY = Math.max(-MAX_DISP, Math.min(MAX_DISP, -dy * force));
+        }
+
+        // Spring physics: acceleration toward target, velocity damped each frame
+        const ax = (targetX - sp.x) * STIFFNESS;
+        const ay = (targetY - sp.y) * STIFFNESS;
+        sp.vx = (sp.vx + ax) * DAMPING;
+        sp.vy = (sp.vy + ay) * DAMPING;
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+
+        ref.current.style.transform = `translate(${sp.x.toFixed(2)}px, ${sp.y.toFixed(2)}px)`;
+      });
+
+      // -- Desktop only: dual-layer source-in video canvas --
+      if (!isMobile) {
+        const vid = videoRef.current;
+        const cvs = canvasRef.current;
+        if (vid && cvs && vid.readyState >= 2) {
+          const cw = cvs.offsetWidth  || cvs.parentElement?.offsetWidth  || 300;
+          const ch = cvs.offsetHeight || cvs.parentElement?.offsetHeight || 80;
+          if (cvs.width !== cw || cvs.height !== ch) { cvs.width = cw; cvs.height = ch; }
+
+          if (!fontSizeRef.current && r0.current)
+            fontSizeRef.current = parseFloat(getComputedStyle(r0.current).fontSize) + 'px';
+          const fs = fontSizeRef.current || '80px';
+
+          const ctx = cvs.getContext('2d');
+          ctx.clearRect(0, 0, cw, ch);
+          const cb = cvs.getBoundingClientRect();
+          const chars = 'VeritasCo'.split('');
+
+          ctx.save();
+          ctx.font = `900 ${fs} Outfit, Inter, sans-serif`;
+          ctx.textBaseline = 'alphabetic';
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#fff';
+          letterRefs.forEach((ref, i) => {
+            if (!ref.current) return;
+            const r = ref.current.getBoundingClientRect();
+            ctx.fillText(chars[i], r.left - cb.left, r.bottom - cb.top);
+          });
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.drawImage(vid, 0, 0, cw, ch);
+          ctx.restore();
+        }
+      }
+
+      rafId.current = requestAnimationFrame(tick);
+    };
+    rafId.current = requestAnimationFrame(tick);
+
+    // Explicitly start video (browsers block autoplay on off-screen elements)
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, []);
+
+  const links = [
+    { label: 'How It Works', href: '#how-it-works' },
+    { label: 'Pricing', href: '#pricing' },
+    { label: 'Contact', href: 'mailto:info@veritasco.tech' },
+    { label: 'Instagram', href: 'https://www.instagram.com/r_e_z_o_s_nd', external: true },
+  ];
+
+  return (
+    <footer aria-label="VeritasCo" className="bg-[#F5F5F5] text-gray-900 relative overflow-hidden border-t border-gray-200">
+
+      {/* Subtle ambient glow */}
+      <div aria-hidden="true" className="absolute top-0 left-1/4 w-80 h-64 bg-blue-500/5 blur-[80px] pointer-events-none rounded-full" />
+
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-12 pt-10 sm:pt-14 md:pt-16 pb-8">
+
+        {/* -- Top Row: Logo + CTA -- */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5 mb-8 md:mb-12">
+
+          {/* Logo + tagline */}
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <img src="/veritasco.png" alt="VeritasCo"
+                style={{ width: 28, height: 28, objectFit: 'contain' }} />
+              <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.02em' }}>
+                VeritasCo
+              </span>
             </div>
-            <div>
-              <div className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Phone</div>
-              <a href="tel:+918709442363" className="text-[15px] font-medium text-gray-900 hover:text-blue-600 transition-colors">8709442363</a>
-            </div>
+            <p className="text-[13px] text-gray-500 leading-relaxed max-w-[260px]">
+              India&apos;s most trusted CBSE re-evaluation advisory.
+            </p>
           </div>
+
+          {/* CTA -- white pill with black border & black arrow */}
+          <a
+            href="/auth"
+            className="self-start sm:self-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13.5px] font-semibold bg-white border border-gray-900 text-gray-900 transition-all hover:bg-gray-900 hover:text-white no-underline whitespace-nowrap shadow-sm"
+          >
+            Check My Chances
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
         </div>
 
-        <div>
-          <h4 className="font-bold text-gray-900 mb-6">Important Info</h4>
-          <p className="text-[13px] text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100">
-            <strong>Note:</strong> Phone support may not always be available. For faster responses and detailed assistance, please contact us through email.
-          </p>
-          <div className="mt-6">
-            <div className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Support Hours</div>
-            <div className="text-[14px] font-medium text-gray-900">10:00 AM – 8:00 PM IST</div>
-          </div>
-        </div>
+        {/* -- Giant Magnetic Wordmark -- */}
+        <video
+          ref={videoRef} src="/bg.mp4"
+          autoPlay loop muted playsInline preload="auto"
+          style={{ position: 'fixed', left: '-9999px', top: 0, width: 2, height: 2, opacity: 0.01, pointerEvents: 'none' }}
+        />
 
-        <div>
-          <h4 className="font-bold text-gray-900 mb-6">Quick Links</h4>
-          <ul className="space-y-3">
-            {['Home', 'Features', 'How it Works', 'Pricing', 'FAQ'].map(link => (
-              <li key={link}>
-                <a href={`#${link.toLowerCase().replace(/\s+/g, '-')}`} className="text-[14px] font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  {link}
-                </a>
-              </li>
+        {/* -- Magnetic Wordmark -- */}
+        <div
+          ref={svgRef}
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: 'clamp(36px, 11vw, 230px)',
+            overflow: 'visible',
+            marginBottom: 24,
+          }}
+        >
+          {/* Desktop only: canvas for source-in video dual-layer */}
+          {!isMobile && (
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%',
+                pointerEvents: 'none', zIndex: 3,
+              }}
+            />
+          )}
+
+          {/* Letters: yellow on mobile (single layer), yellow+video on desktop */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between',
+            zIndex: 1,
+          }}>
+            {'VeritasCo'.split('').map((char, i) => (
+              <span
+                key={i}
+                ref={letterRefs[i]}
+                style={{
+                  fontFamily: '"Outfit", "Inter", sans-serif',
+                  fontWeight: 900,
+                  fontSize: 'clamp(28px, 9.5vw, 200px)',
+                  background: 'linear-gradient(160deg, #f59e0b 0%, #d97706 60%, #92400e 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  display: 'inline-block',
+                  willChange: 'transform',
+                  userSelect: 'none',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1,
+                }}
+              >{char}</span>
             ))}
-            <li><Link to="/auth" className="text-[14px] font-medium text-gray-500 hover:text-gray-900 transition-colors">Login / Register</Link></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <p className="text-[13px] text-gray-400 font-medium">
-            © {new Date().getFullYear()} Veritasco Recheck. All rights reserved.
-          </p>
-          <div className="text-xs font-semibold text-gray-400 flex items-center gap-1">
-            <span>Designed by</span>
-            <a
-              href="https://www.instagram.com/r_e_z_o_s_nd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-blue-600 transition-colors font-bold underline decoration-wavy decoration-blue-500/30"
-            >
-              rezosnd
-            </a>
           </div>
         </div>
-        <div className="text-[12px] text-gray-500 border border-gray-100 px-4 py-2 rounded-full bg-gray-50 font-medium">
-          Disclaimer: This platform is not affiliated with CBSE. Educational guidance platform only.
-        </div>
-      </div>
-    </div>
-  </footer>
-);
 
-// ─── Main Landing Page ────────────────────────────────────────────────────────
+        {/* -- Divider -- */}
+        <div className="h-px bg-gray-200 mb-5" />
+
+        {/* -- Footer Nav -- */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+          {/* Links */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {links.map((l) => (
+              <a key={l.label} href={l.href}
+                target={l.external ? '_blank' : undefined}
+                rel={l.external ? 'noopener noreferrer' : undefined}
+                onMouseEnter={() => setHov(l.label)}
+                onMouseLeave={() => setHov(null)}
+                style={{
+                  color: hov === l.label ? '#111827' : '#6b7280',
+                  textDecoration: 'none', fontSize: 13, fontWeight: 500,
+                  transition: 'color 0.2s',
+                }}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+
+          {/* Copyright */}
+          <div className="flex flex-col sm:items-end gap-0.5">
+            <span className="text-[11px] text-gray-400">Not affiliated with CBSE. Educational guidance only.</span>
+            <span className="text-[12px] text-gray-500 font-medium">© {new Date().getFullYear()} VeritasCo</span>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  );
+};
+
+// --- Main Landing Page --------------------------------------------------------
 const LandingPage = () => (
   <div className="font-inter bg-[#F5F5F5] selection:bg-blue-100 selection:text-blue-900">
     <Navbar />
     <Hero />
     <HowItWorks />
+    <MidStatement
+      text="Don't guess. Get expert eyes on your paper"
+      accent="before you decide."
+      stats={[
+        { value: '100+', label: 'Students' },
+        { value: '4.9★', label: 'Rating' },
+      ]}
+    />
     <Features />
+    <MidStatement
+      text="Transparent pricing."
+      accent="No hidden fees, ever."
+      stats={[
+        { value: '12hr', label: 'Turnaround' },
+        { value: '95%', label: 'Accuracy' },
+      ]}
+    />
     <Pricing />
     <FAQ />
-    <Footer />
-    <LiveActivityWidget />
+    <OuroFooter />
   </div>
 );
 
 export default LandingPage;
-
