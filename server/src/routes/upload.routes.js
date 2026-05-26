@@ -35,7 +35,6 @@ router.post('/multiple', upload.array('files', 5), (req, res) => {
 router.delete('/:publicId', async (req, res) => {
   try {
     const publicId = decodeURIComponent(req.params.publicId);
-    // Validate publicId format (prevent path traversal)
     if (!/^[a-zA-Z0-9/_-]+$/.test(publicId)) {
       return res.status(400).json({ success: false, message: 'Invalid file ID.' });
     }
@@ -43,6 +42,28 @@ router.delete('/:publicId', async (req, res) => {
     res.status(200).json({ success: true, message: 'File deleted.' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to delete file.' });
+  }
+});
+
+// GET /api/upload/download - Proxy file download to avoid CORS and fl_attachment errors
+router.get('/download', async (req, res) => {
+  try {
+    const { url, filename } = req.query;
+    if (!url) return res.status(400).send('URL is required');
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch from Cloudinary');
+
+    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
+    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+
+    // Pipe the response stream directly to the client
+    const { Readable } = require('stream');
+    const readable = Readable.fromWeb(response.body);
+    readable.pipe(res);
+  } catch (err) {
+    console.error('Proxy download error:', err);
+    res.status(500).send('Failed to download file');
   }
 });
 

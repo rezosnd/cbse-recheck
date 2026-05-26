@@ -67,21 +67,12 @@ const AdminApplicationDetail = () => {
 
   const handleDownload = (fileUrl, fileName) => {
     try {
-      if (fileUrl.includes('res.cloudinary.com')) {
-        // Add fl_attachment flag for Cloudinary
-        let downloadUrl = fileUrl;
-        if (!fileUrl.includes('fl_attachment')) {
-          downloadUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
-        }
-        
-        toast.success('Download started!');
-        // Directly trigger download in the same tab (it won't navigate away if it's an attachment)
-        window.location.href = downloadUrl;
-        return;
-      }
+      toast.success('Download started!');
+      // Use our backend proxy to avoid CORS and Cloudinary fl_attachment errors
+      const proxyUrl = `${api.defaults.baseURL || '/api'}/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
       
-      // Fallback
-      window.open(fileUrl, '_blank');
+      // Navigate to the proxy URL to trigger the attachment download
+      window.location.href = proxyUrl;
     } catch (err) {
       console.error('Download error:', err);
       window.open(fileUrl, '_blank');
