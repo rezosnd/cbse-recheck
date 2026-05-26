@@ -37,15 +37,13 @@ const storage = new CloudinaryStorage({
     const isImage = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.mimetype);
     const params = {
       folder: 'cbse-recheck/documents',
-      resource_type: isImage ? 'image' : 'raw',
+      resource_type: 'auto',
       use_filename: true,
       unique_filename: true,
       overwrite: false,
-      chunk_size: 6000000, // 6MB chunks — allows large files on any Cloudinary plan
     };
     
     if (isImage) {
-      params.allowed_formats = ['jpg', 'jpeg', 'png'];
       params.transformation = [{ quality: 'auto', fetch_format: 'auto' }];
     }
     
