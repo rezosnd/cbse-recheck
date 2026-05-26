@@ -59,8 +59,15 @@ router.get('/download', (req, res) => {
 
     const https = require('https');
     
-    https.get(url, (response) => {
+    const options = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    };
+
+    https.get(url, options, (response) => {
       if (response.statusCode !== 200) {
+        console.error(`Cloudinary returned status code: ${response.statusCode} for URL: ${url}`);
         return res.status(response.statusCode).send('Failed to fetch from Cloudinary');
       }
 
