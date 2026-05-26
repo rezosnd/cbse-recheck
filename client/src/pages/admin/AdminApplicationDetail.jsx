@@ -67,13 +67,11 @@ const AdminApplicationDetail = () => {
 
   const handleDownload = (fileUrl, fileName) => {
     try {
-      toast.success('Download started!');
-      // We use our backend proxy to bypass Cloudinary fl_attachment errors.
-      // Since the proxy is now a public route (with SSRF protection), we can safely navigate 
-      // directly to it without triggering any "Session Expired" auth errors.
-      const proxyUrl = `${api.defaults.baseURL || '/api'}/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
-      
-      window.location.href = proxyUrl;
+      toast.success('Opening document...');
+      // Cloudinary's free tier strictly blocks forced PDF downloads (fl_attachment) 
+      // and blocks backend proxying (401 Unauthorized for bots) to prevent malware hosting.
+      // The only native, fully supported way is to let the browser handle the PDF securely.
+      window.open(fileUrl, '_blank');
     } catch (err) {
       console.error('Download error:', err);
       window.open(fileUrl, '_blank');
