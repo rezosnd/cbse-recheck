@@ -67,20 +67,20 @@ const AdminApplicationDetail = () => {
 
   const handleDownload = (fileUrl, fileName) => {
     try {
-      // Force Cloudinary to serve the file as an attachment
       if (fileUrl.includes('res.cloudinary.com')) {
-        const downloadUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
-        // Create an invisible iframe to trigger the download without leaving the page
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = downloadUrl;
-        document.body.appendChild(iframe);
-        setTimeout(() => document.body.removeChild(iframe), 5000);
+        // Add fl_attachment flag for Cloudinary
+        let downloadUrl = fileUrl;
+        if (!fileUrl.includes('fl_attachment')) {
+          downloadUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
+        }
+        
         toast.success('Download started!');
+        // Directly trigger download in the same tab (it won't navigate away if it's an attachment)
+        window.location.href = downloadUrl;
         return;
       }
       
-      // Fallback for non-Cloudinary URLs
+      // Fallback
       window.open(fileUrl, '_blank');
     } catch (err) {
       console.error('Download error:', err);
