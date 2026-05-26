@@ -14,7 +14,7 @@ cloudinary.config({
 // Allowed file types
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.pdf'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 // Secure file filter
 const fileFilter = (req, file, cb) => {
@@ -41,6 +41,7 @@ const storage = new CloudinaryStorage({
       use_filename: true,
       unique_filename: true,
       overwrite: false,
+      chunk_size: 6000000, // 6MB chunks — allows large files on any Cloudinary plan
     };
     
     if (isImage) {

@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import StatusBadge from '../components/StatusBadge';
 import PageLoader from '../components/PageLoader';
-import api from '../lib/api';
+import api, { uploadApi } from '../lib/api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
@@ -38,9 +38,26 @@ const ApplicationDetail = () => {
     if (!files.length) return;
 
     const file = files[0];
-    if (file.size > 10 * 1024 * 1024) {
+    const MAX_SIZE_MB = 25;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
       if (fileInputRef.current) fileInputRef.current.value = '';
-      return toast.error('File size is larger than 10MB');
+      toast(
+        (t) => (
+          <div style={{ maxWidth: 320 }}>
+            <p style={{ fontWeight: 700, marginBottom: 4 }}>File too large ({(file.size / 1024 / 1024).toFixed(1)} MB)</p>
+            <p style={{ fontSize: 13, marginBottom: 8, color: '#555' }}>Max allowed size is {MAX_SIZE_MB} MB. You can email your answer sheet directly instead.</p>
+            <a
+              href={`mailto:info@veritasco.tech?subject=Answer Sheet – ${subjectName}&body=Hi, I am attaching my answer sheet for ${subjectName}. Application ID: ${id}`}
+              style={{ color: '#2563eb', fontWeight: 700, fontSize: 13 }}
+              onClick={() => toast.dismiss(t.id)}
+            >
+              📧 Send to info@veritasco.tech
+            </a>
+          </div>
+        ),
+        { duration: 8000 }
+      );
+      return;
     }
 
     const formData = new FormData();
@@ -52,13 +69,30 @@ const ApplicationDetail = () => {
 
     setUploadingSubject(subjectName);
     try {
-      await api.post(`/applications/${id}/upload-files`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      await uploadApi.post(`/applications/${id}/upload-files`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        // uploadApi already has a 3-minute timeout built in
       });
       toast.success(`${subjectName} answer sheet uploaded successfully`);
       fetchApplication();
     } catch (err) {
-      toast.error('Failed to upload file');
+      console.error('Upload error:', err);
+      toast(
+        (t) => (
+          <div style={{ maxWidth: 320 }}>
+            <p style={{ fontWeight: 700, marginBottom: 4 }}>Upload failed</p>
+            <p style={{ fontSize: 13, marginBottom: 8, color: '#555' }}>You can email your answer sheet directly and we'll attach it manually.</p>
+            <a
+              href={`mailto:info@veritasco.tech?subject=Answer Sheet – ${subjectName}&body=Hi, I could not upload my answer sheet for ${subjectName}. Please find it attached. Application ID: ${id}`}
+              style={{ color: '#2563eb', fontWeight: 700, fontSize: 13 }}
+              onClick={() => toast.dismiss(t.id)}
+            >
+              📧 Send to info@veritasco.tech
+            </a>
+          </div>
+        ),
+        { duration: 10000 }
+      );
     } finally {
       setUploadingSubject(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -263,7 +297,11 @@ const ApplicationDetail = () => {
                     ref={fileInputRef} 
                     onChange={(e) => handleFileUpload(e, activeSubject)} 
                   />
-                  <p className="text-[11px] text-center text-gray-400 font-medium pt-2">Max size: 10MB per file. Formats: PDF, JPG, PNG</p>
+                  <p className="text-[11px] text-center text-gray-400 font-medium pt-2">Max size: 25MB per file. Formats: PDF, JPG, PNG</p>
+                  <p className="text-[11px] text-center font-medium pt-1">
+                    <span className="text-gray-400">Can't upload? Email directly: </span>
+                    <a href="mailto:info@veritasco.tech" className="text-blue-500 hover:underline font-semibold">info@veritasco.tech</a>
+                  </p>
                 </div>
               )}
             </div>
