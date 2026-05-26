@@ -40,7 +40,7 @@ exports.getDashboard = async (req, res) => {
 exports.getAllApplications = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(50, parseInt(req.query.limit) || 20);
+    const limit = Math.min(10000, parseInt(req.query.limit) || 1000);
     const skip = (page - 1) * limit;
 
     const filter = { isDeleted: false };
@@ -217,7 +217,7 @@ exports.exportCSV = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(50, parseInt(req.query.limit) || 20);
+    const limit = Math.min(10000, parseInt(req.query.limit) || 1000);
     const skip = (page - 1) * limit;
 
     const filter = { role: 'user' };

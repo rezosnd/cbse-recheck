@@ -24,7 +24,7 @@ const AdminApplications = () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/applications', {
-        params: { search, status }
+        params: { search, status, limit: 10000 }
       });
       setApplications(res.data.applications);
     } catch (err) {

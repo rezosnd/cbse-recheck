@@ -108,6 +108,28 @@ const AdminApplicationDetail = () => {
           </div>
         </div>
 
+        {/* Extended Details */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Roll Number</div>
+            <div className="text-[14px] font-bold text-gray-900">{app.rollNo || '-'}</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Stream</div>
+            <div className="text-[14px] font-bold text-gray-900">{app.stream || '-'}</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Payment Info</div>
+            <div className="text-[14px] font-bold text-gray-900">₹{app.paymentAmount || 0}</div>
+            {app.paymentId && <div className="text-[11px] text-gray-500 mt-1 truncate" title={app.paymentId}>ID: {app.paymentId}</div>}
+            {app.orderId && <div className="text-[11px] text-gray-500 truncate" title={app.orderId}>Order: {app.orderId}</div>}
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Submitted Date</div>
+            <div className="text-[14px] font-bold text-gray-900">{new Date(app.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           
           {/* Left Column */}

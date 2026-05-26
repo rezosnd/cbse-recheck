@@ -20,7 +20,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/users', { params: { search } });
+      const res = await api.get('/admin/users', { params: { search, limit: 10000 } });
       setUsers(res.data.users);
     } catch (err) {
       toast.error('Failed to load users');
