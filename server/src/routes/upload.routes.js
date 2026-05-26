@@ -3,8 +3,7 @@ const router = express.Router();
 const { upload, deleteFile } = require('../services/cloudinary.service');
 const { protect } = require('../middleware/auth.middleware');
 
-router.use(protect);
-
+// protect middleware moved down
 // POST /api/upload/single
 router.post('/single', upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
@@ -46,10 +45,17 @@ router.delete('/:publicId', async (req, res) => {
 });
 
 // GET /api/upload/download - Proxy file download to avoid CORS and fl_attachment errors
+// We place this BEFORE protect so it can be accessed directly via URL without auth token headers,
+// which prevents false 'session expired' errors when downloading.
 router.get('/download', (req, res) => {
   try {
     const { url, filename } = req.query;
     if (!url) return res.status(400).send('URL is required');
+    
+    // SSRF Protection: Only allow proxying Cloudinary URLs!
+    if (!url.startsWith('https://res.cloudinary.com/')) {
+      return res.status(403).send('Forbidden URL');
+    }
 
     const https = require('https');
     
@@ -72,5 +78,8 @@ router.get('/download', (req, res) => {
     res.status(500).send('Failed to download file');
   }
 });
+
+// Protect all other routes below this line
+router.use(protect);
 
 module.exports = router;

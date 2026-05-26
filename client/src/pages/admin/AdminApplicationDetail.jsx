@@ -65,31 +65,17 @@ const AdminApplicationDetail = () => {
     }
   };
 
-  const handleDownload = async (fileUrl, fileName) => {
-    const toastId = toast.loading('Preparing download...');
+  const handleDownload = (fileUrl, fileName) => {
     try {
-      // Use our backend proxy to avoid CORS and Cloudinary fl_attachment errors
-      // We use api.get() instead of window.location so that your Auth token is sent
-      const proxyUrl = `/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
+      toast.success('Download started!');
+      // We use our backend proxy to bypass Cloudinary fl_attachment errors.
+      // Since the proxy is now a public route (with SSRF protection), we can safely navigate 
+      // directly to it without triggering any "Session Expired" auth errors.
+      const proxyUrl = `${api.defaults.baseURL || '/api'}/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
       
-      const response = await api.get(proxyUrl, {
-        responseType: 'blob' // Important: tells axios to handle the binary file correctly
-      });
-
-      // Create a temporary link to download the blob
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName || 'document.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      
-      toast.success('Downloaded successfully!', { id: toastId });
+      window.location.href = proxyUrl;
     } catch (err) {
       console.error('Download error:', err);
-      toast.dismiss(toastId);
       window.open(fileUrl, '_blank');
     }
   };
