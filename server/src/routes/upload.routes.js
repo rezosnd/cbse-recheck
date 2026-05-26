@@ -47,7 +47,7 @@ router.delete('/:publicId', async (req, res) => {
 // GET /api/upload/download - Proxy file download to avoid CORS and fl_attachment errors
 // We place this BEFORE protect so it can be accessed directly via URL without auth token headers,
 // which prevents false 'session expired' errors when downloading.
-router.get('/download', (req, res) => {
+router.get('/download', async (req, res) => {
   try {
     const { url, filename } = req.query;
     if (!url) return res.status(400).send('URL is required');
@@ -57,29 +57,26 @@ router.get('/download', (req, res) => {
       return res.status(403).send('Forbidden URL');
     }
 
-    const https = require('https');
-    
-    const options = {
+    const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    };
-
-    https.get(url, options, (response) => {
-      if (response.statusCode !== 200) {
-        console.error(`Cloudinary returned status code: ${response.statusCode} for URL: ${url}`);
-        return res.status(response.statusCode).send('Failed to fetch from Cloudinary');
-      }
-
-      res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
-      res.setHeader('Content-Type', response.headers['content-type'] || 'application/pdf');
-
-      // Pipe the response stream directly to the client
-      response.pipe(res);
-    }).on('error', (err) => {
-      console.error('Proxy download https error:', err);
-      res.status(500).send('Failed to download file');
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': '*/*'
+      },
+      redirect: 'follow'
     });
+
+    if (!response.ok) {
+      console.error(`Cloudinary returned ${response.status} ${response.statusText} for URL: ${url}`);
+      return res.status(response.status).send('Failed to fetch from Cloudinary');
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
+    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+
+    // Pipe the response stream directly to the client
+    const { Readable } = require('stream');
+    const readable = Readable.fromWeb(response.body);
+    readable.pipe(res);
   } catch (err) {
     console.error('Proxy download error:', err);
     res.status(500).send('Failed to download file');
