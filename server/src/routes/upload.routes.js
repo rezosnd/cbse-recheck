@@ -46,21 +46,27 @@ router.delete('/:publicId', async (req, res) => {
 });
 
 // GET /api/upload/download - Proxy file download to avoid CORS and fl_attachment errors
-router.get('/download', async (req, res) => {
+router.get('/download', (req, res) => {
   try {
     const { url, filename } = req.query;
     if (!url) return res.status(400).send('URL is required');
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch from Cloudinary');
+    const https = require('https');
+    
+    https.get(url, (response) => {
+      if (response.statusCode !== 200) {
+        return res.status(response.statusCode).send('Failed to fetch from Cloudinary');
+      }
 
-    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
-    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
+      res.setHeader('Content-Type', response.headers['content-type'] || 'application/pdf');
 
-    // Pipe the response stream directly to the client
-    const { Readable } = require('stream');
-    const readable = Readable.fromWeb(response.body);
-    readable.pipe(res);
+      // Pipe the response stream directly to the client
+      response.pipe(res);
+    }).on('error', (err) => {
+      console.error('Proxy download https error:', err);
+      res.status(500).send('Failed to download file');
+    });
   } catch (err) {
     console.error('Proxy download error:', err);
     res.status(500).send('Failed to download file');
