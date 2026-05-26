@@ -65,16 +65,31 @@ const AdminApplicationDetail = () => {
     }
   };
 
-  const handleDownload = (fileUrl, fileName) => {
+  const handleDownload = async (fileUrl, fileName) => {
+    const toastId = toast.loading('Preparing download...');
     try {
-      toast.success('Download started!');
       // Use our backend proxy to avoid CORS and Cloudinary fl_attachment errors
-      const proxyUrl = `${api.defaults.baseURL || '/api'}/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
+      // We use api.get() instead of window.location so that your Auth token is sent
+      const proxyUrl = `/upload/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName || 'document.pdf')}`;
       
-      // Navigate to the proxy URL to trigger the attachment download
-      window.location.href = proxyUrl;
+      const response = await api.get(proxyUrl, {
+        responseType: 'blob' // Important: tells axios to handle the binary file correctly
+      });
+
+      // Create a temporary link to download the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'document.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Downloaded successfully!', { id: toastId });
     } catch (err) {
       console.error('Download error:', err);
+      toast.dismiss(toastId);
       window.open(fileUrl, '_blank');
     }
   };
