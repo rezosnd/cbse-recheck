@@ -68,13 +68,13 @@ const AdminApplicationDetail = () => {
   const handleDownload = (fileUrl, fileName) => {
     try {
       toast.success('Opening document...');
-      // Cloudinary's free tier strictly blocks forced PDF downloads (fl_attachment) 
-      // and blocks backend proxying (401 Unauthorized for bots) to prevent malware hosting.
-      // The only native, fully supported way is to let the browser handle the PDF securely.
-      window.open(fileUrl, '_blank');
+      // Many mobile browsers (like in-app WebViews or strict Safari settings) block 
+      // window.open() completely, which results in a "This site can't be reached" error.
+      // The safest, most compatible way is to simply navigate to the URL. You can press 'Back' to return.
+      window.location.assign(fileUrl);
     } catch (err) {
       console.error('Download error:', err);
-      window.open(fileUrl, '_blank');
+      window.location.assign(fileUrl);
     }
   };
 
