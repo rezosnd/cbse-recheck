@@ -67,14 +67,17 @@ const AdminApplicationDetail = () => {
 
   const handleDownload = (fileUrl, fileName) => {
     try {
-      toast.success('Opening document...');
-      // Many mobile browsers (like in-app WebViews or strict Safari settings) block 
-      // window.open() completely, which results in a "This site can't be reached" error.
-      // The safest, most compatible way is to simply navigate to the URL. You can press 'Back' to return.
-      window.location.assign(fileUrl);
+      toast.success('Opening document securely...');
+      // Since your mobile network/ISP is blocking Cloudinary directly ("This site can't be reached")
+      // and Cloudinary blocks backend proxies, we use the official Google Docs PDF Viewer.
+      // Google's servers will download the PDF from Cloudinary on your behalf and render it securely,
+      // completely bypassing your local network block!
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`;
+      window.location.assign(googleDocsUrl);
     } catch (err) {
       console.error('Download error:', err);
-      window.location.assign(fileUrl);
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`;
+      window.location.assign(googleDocsUrl);
     }
   };
 
