@@ -41,6 +41,7 @@ const storage = new CloudinaryStorage({
       use_filename: true,
       unique_filename: true,
       overwrite: false,
+      chunk_size: 6000000, // 6MB chunks
     };
     
     if (isImage) {
