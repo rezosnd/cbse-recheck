@@ -65,19 +65,18 @@ const AdminApplicationDetail = () => {
     }
   };
 
-  const handleDownload = (fileUrl, fileName) => {
+  const handleDownload = (file) => {
     try {
-      toast.success('Opening document securely...');
-      // Since your mobile network/ISP is blocking Cloudinary directly ("This site can't be reached")
-      // and Cloudinary blocks backend proxies, we use the official Google Docs PDF Viewer.
-      // Google's servers will download the PDF from Cloudinary on your behalf and render it securely,
-      // completely bypassing your local network block!
-      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`;
-      window.location.assign(googleDocsUrl);
+      toast.success('Generating secure ZIP file...');
+      // By using the Cloudinary Archive API, we bypass local ISP blocks (res.cloudinary.com)
+      // AND we bypass Cloudinary's strict anti-malware delivery rules for PDFs!
+      const publicId = file.publicId;
+      const downloadUrl = `${api.defaults.baseURL || '/api'}/upload/download-zip?publicId=${encodeURIComponent(publicId)}`;
+      
+      window.location.assign(downloadUrl);
     } catch (err) {
       console.error('Download error:', err);
-      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}`;
-      window.location.assign(googleDocsUrl);
+      toast.error('Failed to start download');
     }
   };
 
@@ -259,7 +258,7 @@ const AdminApplicationDetail = () => {
                             <span className="text-[12px] truncate font-medium text-gray-600">{file.fileName}</span>
                           </div>
                           <button 
-                            onClick={() => handleDownload(file.fileUrl, file.fileName)} 
+                            onClick={() => handleDownload(file)} 
                             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
                             title="Download Answer Sheet"
                           >

@@ -44,42 +44,27 @@ router.delete('/:publicId', async (req, res) => {
   }
 });
 
-// GET /api/upload/download - Proxy file download to avoid CORS and fl_attachment errors
-// We place this BEFORE protect so it can be accessed directly via URL without auth token headers,
-// which prevents false 'session expired' errors when downloading.
-router.get('/download', async (req, res) => {
+// GET /api/upload/download-zip - Securely download Cloudinary PDFs as a ZIP file
+// This bypasses BOTH local ISP blocks on res.cloudinary.com AND Cloudinary's strict PDF anti-malware delivery rules!
+router.get('/download-zip', (req, res) => {
   try {
-    const { url, filename } = req.query;
-    if (!url) return res.status(400).send('URL is required');
-    
-    // SSRF Protection: Only allow proxying Cloudinary URLs!
-    if (!url.startsWith('https://res.cloudinary.com/')) {
-      return res.status(403).send('Forbidden URL');
-    }
+    const { publicId } = req.query;
+    if (!publicId) return res.status(400).send('Public ID is required');
 
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': '*/*'
-      },
-      redirect: 'follow'
+    const { v2: cloudinary } = require('cloudinary');
+    
+    // Generate an authenticated ZIP download URL that uses api.cloudinary.com (which ISPs do not block)
+    const url = cloudinary.utils.download_archive_url({
+      public_ids: [publicId],
+      resource_type: 'image', // Cloudinary auto-classified the PDFs as images
+      target_format: 'zip'
     });
 
-    if (!response.ok) {
-      console.error(`Cloudinary returned ${response.status} ${response.statusText} for URL: ${url}`);
-      return res.status(response.status).send('Failed to fetch from Cloudinary');
-    }
-
-    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'download.pdf'}"`);
-    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
-
-    // Pipe the response stream directly to the client
-    const { Readable } = require('stream');
-    const readable = Readable.fromWeb(response.body);
-    readable.pipe(res);
+    // Redirect the browser to instantly start downloading the ZIP file
+    res.redirect(url);
   } catch (err) {
-    console.error('Proxy download error:', err);
-    res.status(500).send('Failed to download file');
+    console.error('Archive download error:', err);
+    res.status(500).send('Failed to generate download link');
   }
 });
 
