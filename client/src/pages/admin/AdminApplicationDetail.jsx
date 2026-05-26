@@ -65,24 +65,25 @@ const AdminApplicationDetail = () => {
     }
   };
 
-  const handleDownload = async (fileUrl, fileName) => {
-    const toastId = toast.loading('Preparing download...');
+  const handleDownload = (fileUrl, fileName) => {
     try {
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      toast.success('Downloaded successfully!', { id: toastId });
+      // Force Cloudinary to serve the file as an attachment
+      if (fileUrl.includes('res.cloudinary.com')) {
+        const downloadUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
+        // Create an invisible iframe to trigger the download without leaving the page
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = downloadUrl;
+        document.body.appendChild(iframe);
+        setTimeout(() => document.body.removeChild(iframe), 5000);
+        toast.success('Download started!');
+        return;
+      }
+      
+      // Fallback for non-Cloudinary URLs
+      window.open(fileUrl, '_blank');
     } catch (err) {
       console.error('Download error:', err);
-      toast.dismiss(toastId);
       window.open(fileUrl, '_blank');
     }
   };
