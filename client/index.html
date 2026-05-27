@@ -73,9 +73,55 @@
         }
       }
     </script>
-  </head>
+  <style>
+    /* Premium glassmorphism popup */
+    .popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 12px 20px;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: popin 0.6s ease-out;
+      z-index: 1000;
+    }
+    .popup button {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    @keyframes popin {
+      0% { transform: translateY(100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
   <body>
     <div id="root"></div>
+    <div class="popup">
+      <span>Live Count: <strong id="live-count">100</strong>+</span>
+      <button aria-label="Close" onclick="this.parentElement.style.display='none'">&times;</button>
+    <script>
+      // Simple demo: increment count every second
+      let count = 100;
+      const el = document.getElementById('live-count');
+      setInterval(() => {
+        count += Math.floor(Math.random() * 5); // random increase
+        el.textContent = count;
+      }, 1000);
+    </script>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
