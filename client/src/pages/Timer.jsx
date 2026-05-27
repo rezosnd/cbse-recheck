@@ -15,12 +15,17 @@ const Timer = () => {
     setTargetTime(defaultTime);
   }, []);
 
-  // Use sendric.com for free timer GIF generation
-  // format tm requires UTC time or we add tmz.
-  // Since input datetime-local does not include seconds or Z, we append :00
-  const timerGifUrl = targetTime 
-    ? `https://gen.sendric.com/?tm=${targetTime}:00&tmz=Asia/Kolkata&bg=121214&fg=ffffff&f=1` 
-    : '';
+  // Use our own backend for generating the timer GIF
+  const getTimerUrl = () => {
+    if (!targetTime) return '';
+    const ts = new Date(targetTime).toISOString();
+    // For local dev, we use localhost. For production, the API URL.
+    const isDev = window.location.hostname === 'localhost';
+    const baseUrl = isDev ? 'http://localhost:5000' : 'https://api-recheck.veritasco.tech';
+    return `${baseUrl}/api/timer/gif?target=${encodeURIComponent(ts)}`;
+  };
+  
+  const timerGifUrl = getTimerUrl();
 
   const emailHtml = `
 <!DOCTYPE html>
