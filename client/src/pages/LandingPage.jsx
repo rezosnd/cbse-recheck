@@ -458,15 +458,30 @@ const Features = () => (
 
 // --- Pricing ------------------------------------------------------------------
 const plans = [
-  { subjects: 1, price: 29, label: '1 Subject' },
-  { subjects: 2, price: 40, label: '2 Subjects', popular: true },
-  { subjects: '3+', price: 49, label: '3+ Subjects' },
+  { subjects: 1, price: 34, originalPrice: 60, label: '1 Subject' },
+  { subjects: 2, price: 44, originalPrice: 100, label: '2 Subjects', popular: true },
+  { subjects: '3+', price: 64, originalPrice: 150, label: '3+ Subjects' },
 ];
 
 const Pricing = () => (
-  <section id="pricing" className="py-32 bg-white">
+  <section id="pricing" className="py-32 bg-white relative">
     <div className="container-max max-w-5xl">
-      <div className="text-center mb-20">
+      <div className="text-center mb-24 mt-6">
+        <div className="relative inline-block mb-12">
+          <div className="absolute -inset-y-4 -inset-x-8 z-0">
+            {/* Hand-drawn red circle/ellipse */}
+            <svg className="w-full h-full text-red-500 opacity-90" viewBox="0 0 200 60" preserveAspectRatio="none" fill="none">
+              <path d="M100,5 C150,2 195,15 190,30 C185,45 140,58 100,55 C50,52 5,40 10,25 C15,10 60,8 100,5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="600" strokeDashoffset="0" />
+              <path d="M90,7 C140,4 190,17 185,32 C180,47 135,60 95,57 C45,54 0,42 5,27" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-red-400" />
+            </svg>
+          </div>
+          <span style={{ fontFamily: 'Caveat' }} className="relative z-10 text-4xl md:text-5xl font-extrabold text-red-600 tracking-wide rotate-[-3deg] inline-block transform origin-center">
+            Limited Time Offer!
+          </span>
+          <svg className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 Q10 12 12 22 M7 15 Q12 22 17 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Transparent Pricing</h2>
       </div>
       
@@ -482,9 +497,30 @@ const Pricing = () => (
             )}
             
             <div className="text-[13px] font-semibold tracking-wide uppercase mb-4 opacity-70">{plan.label}</div>
-            <div className="flex items-baseline gap-1 mb-8">
-              <span className="text-5xl font-bold tracking-tighter">₹{plan.price}</span>
-              <span className={`text-[13px] ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>/ one-time</span>
+            
+            <div className="flex flex-col mb-8">
+              <div className="flex items-center gap-3 mb-3 mt-2">
+                <div className="relative inline-block px-1">
+                  <span className={`text-2xl font-bold ${plan.popular ? 'text-gray-400' : 'text-gray-400'}`} style={{ fontFamily: 'Caveat' }}>₹{plan.originalPrice}</span>
+                  {/* Aggressive Red Marker Cross-out */}
+                  <svg className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] text-red-600" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ pointerEvents: 'none', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))' }}>
+                    <path d="M-5,70 Q50,30 105,35 M-10,40 Q50,70 110,60 M0,85 Q50,45 100,15" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                </div>
+                <div className="relative ml-2">
+                  <span style={{ fontFamily: 'Caveat' }} className="text-2xl font-extrabold text-red-500 -rotate-[6deg] inline-block transform origin-bottom-left">
+                    Save {Math.round((1 - plan.price / plan.originalPrice) * 100)}%!
+                  </span>
+                  {/* Hand-drawn underline for the discount */}
+                  <svg className="absolute -bottom-1 left-0 w-full h-2 text-red-500/70" viewBox="0 0 100 10" preserveAspectRatio="none" fill="none">
+                    <path d="M0,5 Q50,9 100,2 M5,8 Q50,2 95,7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-5xl font-bold tracking-tighter">₹{plan.price}</span>
+                <span className={`text-[13px] ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>/ one-time</span>
+              </div>
             </div>
             
             <ul className="space-y-4 mb-10">

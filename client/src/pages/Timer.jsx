@@ -88,16 +88,16 @@ const Timer = () => {
                                 <tr>
                                     <td width="48%" valign="top" style="background-color:#18181b;border:1px solid #27272a;border-radius:12px;padding:24px 16px;text-align:center;">
                                         <p style="margin:0 0 16px 0;color:#71717a;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:bold;">Current Prices</p>
-                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">1 Copy &nbsp;<span style="color:#25D366;font-weight:700;">₹29</span></p>
-                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">2 Copies &nbsp;<span style="color:#25D366;font-weight:700;">₹40</span></p>
-                                        <p style="margin:0;color:#e4e4e7;font-size:15px;font-weight:500;">3+ Copies &nbsp;<span style="color:#25D366;font-weight:700;">₹49</span></p>
+                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">1 Copy &nbsp;<span style="color:#25D366;font-weight:700;">₹39</span></p>
+                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">2 Copies &nbsp;<span style="color:#25D366;font-weight:700;">₹49</span></p>
+                                        <p style="margin:0;color:#e4e4e7;font-size:15px;font-weight:500;">3+ Copies &nbsp;<span style="color:#25D366;font-weight:700;">₹69</span></p>
                                     </td>
                                     <td width="4%"></td>
                                     <td width="48%" valign="top" style="background-color:#1c1314;border:1px solid #3f1515;border-radius:12px;padding:24px 16px;text-align:center;">
                                         <p style="margin:0 0 16px 0;color:#ff3b3b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:bold;">After 1 PM</p>
-                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">1 Copy &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹39</span></p>
-                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">2 Copies &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹49</span></p>
-                                        <p style="margin:0;color:#e4e4e7;font-size:15px;font-weight:500;">3+ Copies &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹69</span></p>
+                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">1 Copy &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹49</span></p>
+                                        <p style="margin:0 0 10px 0;color:#e4e4e7;font-size:15px;font-weight:500;">2 Copies &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹69</span></p>
+                                        <p style="margin:0;color:#e4e4e7;font-size:15px;font-weight:500;">3+ Copies &nbsp;<span style="color:#ff3b3b;font-weight:700;">₹89</span></p>
                                     </td>
                                 </tr>
                             </table>
