@@ -10,6 +10,32 @@ import api from '../../lib/api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
+const EmailListCard = ({ title, emails = [] }) => {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(emails.join(', '));
+    toast.success('Copied to clipboard!');
+  };
+
+  return (
+    <div className="border border-gray-100 rounded-2xl p-5 bg-gray-50/30 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-[14px] font-bold text-gray-900">{title}</h3>
+        <span className="text-[12px] font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">{emails.length}</span>
+      </div>
+      <div className="text-[12px] text-gray-500 font-medium mb-4 flex-1 line-clamp-3 break-all">
+        {emails.length > 0 ? emails.join(', ') : 'No emails found'}
+      </div>
+      <button 
+        onClick={handleCopy}
+        disabled={emails.length === 0}
+        className="mt-auto w-full py-2 bg-white border border-gray-200 rounded-xl text-[13px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+      >
+        Copy All
+      </button>
+    </div>
+  );
+};
+
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
     className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex items-center gap-4 transition-transform hover:-translate-y-1"
@@ -139,6 +165,18 @@ const AdminDashboard = () => {
           </div>
 
         </div>
+
+        {/* Email Lists */}
+        {data.emailLists && (
+          <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100 mt-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-8">Email Segments</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              <EmailListCard title="Registered, No Application" emails={data.emailLists.loginNotInitiate} />
+              <EmailListCard title="Application Paid" emails={data.emailLists.paid} />
+              <EmailListCard title="Applied, Not Paid" emails={data.emailLists.initiatedNotPaid} />
+            </div>
+          </div>
+        )}
 
       </main>
       <Footer />

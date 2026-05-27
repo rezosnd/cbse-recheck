@@ -11,7 +11,7 @@ exports.getDashboard = async (req, res) => {
   try {
     const [
       totalApplications, totalUsers, pendingApplications, completedApplications,
-      totalRevenueResult, recentApplications, recentPayments,
+      totalRevenueResult, recentApplications, recentPayments, allUsers, allApplications
     ] = await Promise.all([
       Application.countDocuments({ isDeleted: false }),
       User.countDocuments({ role: 'user' }),
@@ -20,15 +20,38 @@ exports.getDashboard = async (req, res) => {
       Payment.aggregate([{ $match: { status: 'paid' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
       Application.find({ isDeleted: false }).sort({ createdAt: -1 }).limit(10).populate('userId', 'name email'),
       Payment.find({ status: 'paid' }).sort({ createdAt: -1 }).limit(10).populate('userId', 'name email'),
+      User.find({ role: 'user' }).select('email _id'),
+      Application.find({ isDeleted: false }).select('studentEmail userId paymentStatus'),
     ]);
 
     const totalRevenue = totalRevenueResult[0]?.total || 0;
+
+    const applicantUserIds = new Set(allApplications.map(a => a.userId?.toString()).filter(Boolean));
+    const loginNotInitiate = allUsers
+      .filter(u => !applicantUserIds.has(u._id.toString()))
+      .map(u => u.email)
+      .filter(Boolean);
+
+    const paidEmails = allApplications
+      .filter(a => a.paymentStatus === 'paid')
+      .map(a => a.studentEmail)
+      .filter(Boolean);
+
+    const initiatedNotPaidEmails = allApplications
+      .filter(a => a.paymentStatus !== 'paid')
+      .map(a => a.studentEmail)
+      .filter(Boolean);
 
     res.status(200).json({
       success: true,
       stats: { totalApplications, totalUsers, pendingApplications, completedApplications, totalRevenue },
       recentApplications,
       recentPayments,
+      emailLists: {
+        loginNotInitiate: [...new Set(loginNotInitiate)],
+        paid: [...new Set(paidEmails)],
+        initiatedNotPaid: [...new Set(initiatedNotPaidEmails)],
+      }
     });
   } catch (err) {
     console.error('Admin dashboard error:', err);
