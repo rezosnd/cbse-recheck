@@ -457,13 +457,36 @@ const Features = () => (
 );
 
 // --- Pricing ------------------------------------------------------------------
+
+
 const plans = [
   { subjects: 1, price: 34, originalPrice: 60, label: '1 Subject' },
   { subjects: 2, price: 44, originalPrice: 100, label: '2 Subjects', popular: true },
   { subjects: '3+', price: 64, originalPrice: 150, label: '3+ Subjects' },
 ];
 
-const Pricing = () => (
+const Pricing = () => {
+  const [timeLeft, setTimeLeft] = useState({ h: '00', m: '00', s: '00' });
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setHours(24, 0, 0, 0); // Next midnight
+      const diff = tomorrow - now;
+      
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
+      const m = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
+      const s = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+      setTimeLeft({ h, m, s });
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
   <section id="pricing" className="py-32 bg-white relative">
     <div className="container-max max-w-5xl">
       <div className="text-center mb-24 mt-6">
@@ -498,26 +521,43 @@ const Pricing = () => (
             
             <div className="text-[13px] font-semibold tracking-wide uppercase mb-4 opacity-70">{plan.label}</div>
             
-            <div className="flex flex-col mb-8">
-              <div className="flex items-center gap-3 mb-3 mt-2">
-                <div className="relative inline-block px-1">
-                  <span className={`text-2xl font-bold ${plan.popular ? 'text-gray-400' : 'text-gray-400'}`} style={{ fontFamily: 'Caveat' }}>₹{plan.originalPrice}</span>
-                  {/* Aggressive Red Marker Cross-out */}
-                  <svg className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] text-red-600" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ pointerEvents: 'none', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))' }}>
-                    <path d="M-5,70 Q50,30 105,35 M-10,40 Q50,70 110,60 M0,85 Q50,45 100,15" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <div className="flex flex-col mb-6">
+              {/* Crossed-out price + compact badge row */}
+              <div className="flex items-center gap-3 mb-3 mt-3">
+                {/* Crossed-out original price */}
+                <div className="relative inline-block">
+                  <span className={`text-2xl font-bold ${plan.popular ? 'text-gray-500' : 'text-gray-400'}`} style={{ fontFamily: 'Caveat' }}>₹{plan.originalPrice}</span>
+                  <svg className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)] text-red-500" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ pointerEvents: 'none' }}>
+                    <path d="M0,60 Q50,35 100,40 M0,45 Q50,65 100,55" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" fill="none" />
                   </svg>
                 </div>
-                <div className="relative ml-2">
-                  <span style={{ fontFamily: 'Caveat' }} className="text-2xl font-extrabold text-red-500 -rotate-[6deg] inline-block transform origin-bottom-left">
-                    Save {Math.round((1 - plan.price / plan.originalPrice) * 100)}%!
-                  </span>
-                  {/* Hand-drawn underline for the discount */}
-                  <svg className="absolute -bottom-1 left-0 w-full h-2 text-red-500/70" viewBox="0 0 100 10" preserveAspectRatio="none" fill="none">
-                    <path d="M0,5 Q50,9 100,2 M5,8 Q50,2 95,7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
+
+                {/* Compact pill chip */}
+                <div className="relative flex-shrink-0">
+                  <div className="flex items-center gap-0 rounded-full overflow-hidden shadow-sm">
+                    {/* % OFF pill-left */}
+                    <div className="bg-red-500 px-2.5 py-1.5 flex items-center gap-1">
+                      <span className="text-[11px] font-black text-white tracking-tight leading-none">
+                        {Math.round((1 - plan.price / plan.originalPrice) * 100)}% OFF
+                      </span>
+                    </div>
+                    {/* Countdown pill-right */}
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1.5 ${plan.popular ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                      {/* Live dot */}
+                      <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                      </span>
+                      <span className={`font-mono text-[12px] font-bold leading-none tabular-nums ${plan.popular ? 'text-white' : 'text-gray-800'}`}>
+                        {timeLeft.h}:{timeLeft.m}:{timeLeft.s}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-baseline gap-1">
+
+              {/* Actual price */}
+              <div className="flex items-baseline gap-1.5">
                 <span className="text-5xl font-bold tracking-tighter">₹{plan.price}</span>
                 <span className={`text-[13px] ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>/ one-time</span>
               </div>
@@ -543,7 +583,8 @@ const Pricing = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 // --- FAQ ----------------------------------------------------------------------
 const faqs = [
