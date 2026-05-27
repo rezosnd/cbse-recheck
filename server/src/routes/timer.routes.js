@@ -7,11 +7,11 @@ const PImage = require('pureimage');
 const router = express.Router();
 
 let fontLoaded = false;
-const fontPath = path.join(__dirname, '../../fonts/Roboto-Bold.ttf');
+const fontPath = path.join(__dirname, '../../fonts/Roboto-Regular.ttf');
 
 function ensureFontLoaded() {
   if (!fontLoaded && fs.existsSync(fontPath)) {
-    const fnt = PImage.registerFont(fontPath, 'Roboto-Bold');
+    const fnt = PImage.registerFont(fontPath, 'Roboto-Regular');
     fnt.loadSync();
     fontLoaded = true;
   }
@@ -24,7 +24,7 @@ function drawFrame(ctx, width, height, text) {
 
   // Add a subtle border or something if needed
   ctx.fillStyle = '#ffffff';
-  ctx.font = '32pt "Roboto-Bold"';
+  ctx.font = '32pt "Roboto-Regular"';
   // pureimage text alignment is basic, let's calculate rough center
   // 32pt is approx 42px height, 16px per char width
   const approximateTextWidth = text.length * 18; 

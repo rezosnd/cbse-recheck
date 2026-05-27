@@ -15,17 +15,22 @@ const Timer = () => {
     setTargetTime(defaultTime);
   }, []);
 
-  // Use our own backend for generating the timer GIF
-  const getTimerUrl = () => {
+  // The local preview needs to use localhost so you can see it before deploying.
+  // The public email needs the production URL because Gmail's servers cannot read 'localhost'.
+  const getTimerUrl = (forPreview) => {
     if (!targetTime) return '';
     const ts = new Date(targetTime).toISOString();
-    // For local dev, we use localhost. For production, the API URL.
-    const isDev = window.location.hostname === 'localhost';
-    const baseUrl = isDev ? 'http://localhost:5000' : 'https://api-recheck.veritasco.tech';
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    const baseUrl = (forPreview && isDev) 
+      ? 'http://localhost:5000' 
+      : 'https://api-recheck.veritasco.tech';
+      
     return `${baseUrl}/api/timer/gif?target=${encodeURIComponent(ts)}`;
   };
   
-  const timerGifUrl = getTimerUrl();
+  const previewTimerGifUrl = getTimerUrl(true);
+  const publicTimerGifUrl = getTimerUrl(false);
 
   const emailHtml = `
 <!DOCTYPE html>
@@ -58,10 +63,10 @@ const Timer = () => {
                         </td>
                     </tr>
 
-                    ${timerGifUrl ? `
+                    ${publicTimerGifUrl ? `
                     <tr>
                         <td align="center" style="padding-bottom:32px;">
-                            <img src="${timerGifUrl}" width="350" style="display:block;width:100%;max-width:350px;border-radius:8px;border:1px solid #222226;" alt="Countdown Timer" />
+                            <img src="${publicTimerGifUrl}" width="350" style="display:block;width:100%;max-width:350px;border-radius:8px;border:1px solid #222226;" alt="Countdown Timer" />
                         </td>
                     </tr>
                     ` : ''}
@@ -228,11 +233,11 @@ const Timer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                Live Preview
+                Live Preview (Local)
               </h2>
               <div className="w-full flex-grow min-h-[700px] border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-[#0A0A0B]">
                 <iframe
-                  srcDoc={emailHtml}
+                  srcDoc={emailHtml.replace(publicTimerGifUrl, previewTimerGifUrl)}
                   className="w-full h-full min-h-[700px]"
                   title="Email Preview"
                 />
