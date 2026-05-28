@@ -35,19 +35,20 @@ const AdminApplications = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('');
 
   useEffect(() => {
     fetchApplications();
-  }, [search, status]);
+  }, [search, status, paymentStatus]);
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/applications', {
         params: {
-          search,
-          status: status.startsWith('pay:') ? undefined : status || undefined,
-          paymentStatus: status === 'pay:paid' ? 'paid' : status === 'pay:pending' ? 'pending' : undefined,
+          search: search || undefined,
+          status: status || undefined,
+          paymentStatus: paymentStatus || undefined,
           limit: 10000
         }
       });
@@ -102,25 +103,31 @@ const AdminApplications = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="relative w-full md:w-56">
+          <div className="relative w-full md:w-52">
             <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <select 
               className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-[14px] rounded-xl py-3 pl-11 pr-8 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white outline-none transition-all font-medium appearance-none"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="">All</option>
-              <optgroup label="─── App Status ───">
-                <option value="submitted">Submitted</option>
-                <option value="payment_verified">Payment Verified</option>
-                <option value="under_review">Under Review</option>
-                <option value="recommendation_ready">Recommendation Ready</option>
-                <option value="completed">Completed</option>
-              </optgroup>
-              <optgroup label="─── Payment Status ───">
-                <option value="pay:paid">Paid</option>
-                <option value="pay:pending">Unpaid / Pending</option>
-              </optgroup>
+              <option value="">All App Statuses</option>
+              <option value="submitted">Submitted</option>
+              <option value="payment_verified">Payment Verified</option>
+              <option value="under_review">Under Review</option>
+              <option value="recommendation_ready">Recommendation Ready</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div className="relative w-full md:w-44">
+            <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <select 
+              className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-[14px] rounded-xl py-3 pl-11 pr-8 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white outline-none transition-all font-medium appearance-none"
+              value={paymentStatus}
+              onChange={(e) => setPaymentStatus(e.target.value)}
+            >
+              <option value="">All Payments</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Unpaid / Pending</option>
             </select>
           </div>
         </div>
