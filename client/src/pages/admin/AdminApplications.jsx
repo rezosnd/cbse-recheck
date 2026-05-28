@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiSearch, FiDownload, FiEye, FiFilter } from 'react-icons/fi';
+import { FiSearch, FiDownload, FiEye, FiFilter, FiCopy, FiCheck } from 'react-icons/fi';
 import Navbar from '../../components/Navbar';
 import StatusBadge from '../../components/StatusBadge';
 import PageLoader from '../../components/PageLoader';
@@ -9,6 +9,26 @@ import Footer from '../../components/Footer';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+
+const CopyEmailBtn = ({ email }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(email).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      title={`Copy ${email}`}
+      className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded text-gray-300 hover:text-blue-500 hover:bg-blue-50 transition-colors align-middle"
+    >
+      {copied ? <FiCheck size={11} className="text-green-500" /> : <FiCopy size={11} />}
+    </button>
+  );
+};
 
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -122,8 +142,10 @@ const AdminApplications = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="font-bold text-[14px] text-gray-900">{app.studentName}</div>
-                        <div className="text-[12px] text-gray-400 font-medium mt-0.5">
-                          {app.studentEmail} {app.studentMobile && <span className="text-gray-500">• {app.studentMobile}</span>}
+                        <div className="text-[12px] text-gray-400 font-medium mt-0.5 flex items-center flex-wrap gap-x-1">
+                          <span>{app.studentEmail}</span>
+                          <CopyEmailBtn email={app.studentEmail} />
+                          {app.studentMobile && <span className="text-gray-500">• {app.studentMobile}</span>}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-[13px] font-semibold text-gray-500">
