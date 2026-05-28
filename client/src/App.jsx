@@ -4,7 +4,7 @@ import { useAuth } from './contexts/AuthContext';
 import MaintenancePage from './pages/MaintenancePage';
 
 // ─── Toggle this to put the site in maintenance mode ───────────────────────
-const MAINTENANCE_MODE = true; // 👈 set to true to show maintenance page
+const MAINTENANCE_MODE = false; // 👈 set to true to show maintenance page
 // ───────────────────────────────────────────────────────────────────────────
 
 // Pages

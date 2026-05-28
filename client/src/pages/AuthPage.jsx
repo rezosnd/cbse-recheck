@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { FiHash, FiArrowRight, FiArrowLeft, FiCheckCircle, FiUser, FiAlertTriangle } from 'react-icons/fi';
 
 // Keep in sync with App.jsx
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const STREAMS = ['Science', 'Commerce', 'Arts', 'Other'];
 
