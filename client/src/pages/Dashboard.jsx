@@ -123,39 +123,40 @@ const Dashboard = () => {
               {applications.map((app, i) => (
                 <motion.div key={app._id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
                   className="p-4 sm:p-5 rounded-[18px] sm:rounded-[24px] border border-gray-100 hover:border-blue-100 hover:bg-blue-50/30 transition-colors group">
-                  <div className="flex items-start justify-between gap-3">
-                    {/* Left: icon + info */}
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
-                        <FiFileText size={18} className="text-blue-600" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="font-bold text-[14px] sm:text-[15px] text-gray-900">{app.requestId}</span>
-                          <StatusBadge status={app.status} size="sm" />
-                        </div>
-                        <div className="text-[12px] sm:text-[13px] font-medium text-gray-500 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                          <span className="bg-gray-100 px-2 py-0.5 rounded-md text-gray-600 truncate max-w-[180px] sm:max-w-none">
-                            {app.subjects?.map(s => s.subject).join(', ')}
-                          </span>
-                          <span className="hidden sm:inline">•</span>
-                          <span className="text-gray-400">{format(new Date(app.createdAt), 'MMM dd, yyyy')}</span>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Right: amount + arrow */}
-                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider">Amount</span>
-                        <span className="text-[14px] sm:text-[15px] font-bold text-gray-900">₹{app.paymentAmount}</span>
+                  {/* Row 1: Request ID + Arrow */}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                        <FiFileText size={15} className="text-blue-600" />
                       </div>
-                      <Link to={`/application/${app._id}`}
-                        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gray-50 text-gray-600 hover:bg-black hover:text-white transition-colors">
-                        <FiArrowRight size={15} />
-                      </Link>
+                      <span className="font-bold text-[14px] sm:text-[15px] text-gray-900 truncate">{app.requestId}</span>
+                    </div>
+                    <Link to={`/application/${app._id}`}
+                      className="flex items-center justify-center w-9 h-9 rounded-xl bg-gray-50 text-gray-600 hover:bg-black hover:text-white transition-colors shrink-0">
+                      <FiArrowRight size={15} />
+                    </Link>
+                  </div>
+
+                  {/* Row 2: Status badge + Amount */}
+                  <div className="flex items-center justify-between gap-2 mb-2 pl-[42px]">
+                    <StatusBadge status={app.status} size="sm" />
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">₹</span>
+                      <span className="text-[15px] font-bold text-gray-900">{app.paymentAmount}</span>
                     </div>
                   </div>
+
+                  {/* Row 3: Subject + Date */}
+                  <div className="flex items-center justify-between gap-2 pl-[42px]">
+                    <span className="bg-gray-100 px-2 py-0.5 rounded-md text-[11px] sm:text-[12px] text-gray-600 font-medium truncate max-w-[160px] sm:max-w-[260px]">
+                      {app.subjects?.map(s => s.subject).join(', ')}
+                    </span>
+                    <span className="text-[11px] sm:text-[12px] text-gray-400 font-medium shrink-0">
+                      {format(new Date(app.createdAt), 'MMM dd, yyyy')}
+                    </span>
+                  </div>
+
                 </motion.div>
               ))}
             </div>
