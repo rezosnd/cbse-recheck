@@ -5,6 +5,16 @@ const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Helper: check if an email is in the admin list
+const isAdminEmail = (email) => {
+  const list = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+  return list.includes(email.toLowerCase());
+};
+
+
 // POST /api/auth/google – Google Login
 exports.googleLogin = async (req, res) => {
   try {
@@ -34,7 +44,7 @@ exports.googleLogin = async (req, res) => {
       });
     }
 
-    if (user.email === process.env.ADMIN_EMAIL && user.role !== 'admin') {
+    if (isAdminEmail(user.email) && user.role !== 'admin') {
       user.role = 'admin';
     }
 
@@ -73,7 +83,7 @@ exports.googleRegister = async (req, res) => {
       isVerified: true,
       stream: stream || 'Science',
       rollNo: rollNo || '',
-      role: email === process.env.ADMIN_EMAIL ? 'admin' : 'user', // Automatically assign admin if email matches
+      role: isAdminEmail(email) ? 'admin' : 'user',
     });
 
     user.lastLogin = new Date();
