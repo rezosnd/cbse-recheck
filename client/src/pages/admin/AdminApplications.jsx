@@ -108,6 +108,7 @@ const AdminApplications = () => {
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider pl-8">Request ID</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Student</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Subjects</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Payment</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Status</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider text-right pr-8">Action</th>
@@ -127,6 +128,11 @@ const AdminApplications = () => {
                       </td>
                       <td className="px-6 py-4 text-[13px] font-semibold text-gray-500">
                         {format(new Date(app.createdAt), 'MMM dd, yyyy')}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-600 text-[12px] font-bold">
+                          {Array.isArray(app.subjects) ? app.subjects.length : '—'}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={app.paymentStatus === 'paid' ? 'paid' : 'pending'} size="sm" />
