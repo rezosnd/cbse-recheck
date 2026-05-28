@@ -44,7 +44,12 @@ const AdminApplications = () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/applications', {
-        params: { search, status, limit: 10000 }
+        params: {
+          search,
+          status: status.startsWith('pay:') ? undefined : status || undefined,
+          paymentStatus: status === 'pay:paid' ? 'paid' : status === 'pay:pending' ? 'pending' : undefined,
+          limit: 10000
+        }
       });
       setApplications(res.data.applications);
     } catch (err) {
@@ -104,12 +109,18 @@ const AdminApplications = () => {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="">All Statuses</option>
-              <option value="submitted">Submitted</option>
-              <option value="payment_verified">Payment Verified</option>
-              <option value="under_review">Under Review</option>
-              <option value="recommendation_ready">Recommendation Ready</option>
-              <option value="completed">Completed</option>
+              <option value="">All</option>
+              <optgroup label="─── App Status ───">
+                <option value="submitted">Submitted</option>
+                <option value="payment_verified">Payment Verified</option>
+                <option value="under_review">Under Review</option>
+                <option value="recommendation_ready">Recommendation Ready</option>
+                <option value="completed">Completed</option>
+              </optgroup>
+              <optgroup label="─── Payment Status ───">
+                <option value="pay:paid">Paid</option>
+                <option value="pay:pending">Unpaid / Pending</option>
+              </optgroup>
             </select>
           </div>
         </div>
