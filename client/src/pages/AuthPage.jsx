@@ -5,7 +5,10 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { FiHash, FiArrowRight, FiArrowLeft, FiCheckCircle, FiUser } from 'react-icons/fi';
+import { FiHash, FiArrowRight, FiArrowLeft, FiCheckCircle, FiUser, FiAlertTriangle } from 'react-icons/fi';
+
+// Keep in sync with App.jsx
+const MAINTENANCE_MODE = true;
 
 const STREAMS = ['Science', 'Commerce', 'Arts', 'Other'];
 
@@ -35,7 +38,11 @@ const AuthPage = () => {
         // Normal login success
         login(res.data.user, res.data.token);
         toast.success(`Welcome back${res.data.user.name ? `, ${res.data.user.name}` : ''}!`);
-        navigate(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
+        if (res.data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate(MAINTENANCE_MODE ? '/' : '/dashboard');
+        }
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Google authentication failed');
@@ -58,7 +65,11 @@ const AuthPage = () => {
       
       login(res.data.user, res.data.token);
       toast.success('Account created successfully!');
-      navigate(res.data.user.role === 'admin' ? '/admin' : '/dashboard');
+      if (res.data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate(MAINTENANCE_MODE ? '/' : '/dashboard');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -93,6 +104,16 @@ const AuthPage = () => {
               {step === 1 ? 'Sign in securely with your Google account' : `Hi ${googleData?.name?.split(' ')[0] || ''}, almost done!`}
             </p>
           </div>
+
+          {/* Maintenance banner — visible to non-admins */}
+          {MAINTENANCE_MODE && (
+            <div className="mb-6 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+              <FiAlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={16} />
+              <p className="text-[13px] text-amber-800 font-medium leading-snug">
+                <strong>Site is temporarily closed.</strong> New applications reopen at <strong>12:00 AM</strong>. Admin login only.
+              </p>
+            </div>
+          )}
 
           <AnimatePresence mode="wait">
             {step === 1 ? (

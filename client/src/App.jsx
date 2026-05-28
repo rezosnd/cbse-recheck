@@ -1,6 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
+import MaintenancePage from './pages/MaintenancePage';
+
+// ─── Toggle this to put the site in maintenance mode ───────────────────────
+const MAINTENANCE_MODE = true; // 👈 set to true to show maintenance page
+// ───────────────────────────────────────────────────────────────────────────
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -25,6 +30,11 @@ const App = () => {
   const { loading, darkMode } = useAuth();
 
   if (loading) return <PageLoader />;
+
+  // Maintenance mode: bypass for /admin and /auth routes so admin can still log in
+  const isAdminOrAuth = window.location.pathname.startsWith('/admin') ||
+                        window.location.pathname.startsWith('/auth');
+  if (MAINTENANCE_MODE && !isAdminOrAuth) return <MaintenancePage />;
 
   return (
     <>
