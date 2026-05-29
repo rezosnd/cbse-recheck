@@ -11,9 +11,9 @@ const razorpay = new Razorpay({
 
 // Calculate price based on subject count
 const calculatePrice = (subjectCount) => {
-  if (subjectCount === 1) return 44;
-  if (subjectCount === 2) return 54;
-  if (subjectCount >= 3) return 84;
+  if (subjectCount === 1) return 60;
+  if (subjectCount === 2) return 100;
+  if (subjectCount >= 3) return 150;
   return 0;
 };
 
