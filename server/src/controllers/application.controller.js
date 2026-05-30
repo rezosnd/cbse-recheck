@@ -279,6 +279,10 @@ exports.uploadFiles = async (req, res) => {
 exports.getDashboardStats = async (req, res) => {
   try {
     const userId = req.user._id;
+    
+    // Fetch user for referral count
+    const user = await User.findById(userId).select('referralCount');
+    
     const [total, pending, underReview, completed, payments] = await Promise.all([
       Application.countDocuments({ userId, isDeleted: false }),
       Application.countDocuments({ userId, isDeleted: false, status: { $in: ['submitted', 'payment_verified'] } }),
@@ -289,7 +293,7 @@ exports.getDashboardStats = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      stats: { total, pending, underReview, completed },
+      stats: { total, pending, underReview, completed, referralCount: user?.referralCount || 0 },
       recentPayments: payments,
     });
   } catch (err) {
