@@ -11,7 +11,7 @@ exports.getDashboard = async (req, res) => {
   try {
     const [
       totalApplications, totalUsers, pendingApplications, completedApplications,
-      totalRevenueResult, recentApplications, recentPayments, allUsers, allApplications
+      totalRevenueResult, recentApplications, recentPayments, allUsers, allApplications, topReferrers
     ] = await Promise.all([
       Application.countDocuments({ isDeleted: false }),
       User.countDocuments({ role: 'user' }),
@@ -22,6 +22,7 @@ exports.getDashboard = async (req, res) => {
       Payment.find({ status: 'paid' }).sort({ createdAt: -1 }).limit(10).populate('userId', 'name email'),
       User.find({ role: 'user' }).select('email _id'),
       Application.find({ isDeleted: false }).select('studentEmail userId paymentStatus'),
+      User.find({ role: 'user', referralCount: { $gt: 0 } }).sort({ referralCount: -1 }).limit(10).select('name email referralCount referralCode'),
     ]);
 
     const totalRevenue = totalRevenueResult[0]?.total || 0;
@@ -51,7 +52,8 @@ exports.getDashboard = async (req, res) => {
         loginNotInitiate: [...new Set(loginNotInitiate)],
         paid: [...new Set(paidEmails)],
         initiatedNotPaid: [...new Set(initiatedNotPaidEmails)],
-      }
+      },
+      topReferrers
     });
   } catch (err) {
     console.error('Admin dashboard error:', err);
@@ -67,8 +69,8 @@ exports.getAllApplications = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const filter = { isDeleted: false };
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.paymentStatus) filter.paymentStatus = req.query.paymentStatus;
+    if (req.query.status) filter.status = String(req.query.status);
+    if (req.query.paymentStatus) filter.paymentStatus = String(req.query.paymentStatus);
 
     // Search
     if (req.query.search) {
@@ -130,7 +132,7 @@ exports.updateStatus = async (req, res) => {
     }
 
     const update = { status, reviewedBy: req.user._id };
-    if (adminNotes) update.adminNotes = adminNotes.substring(0, 2000);
+    if (adminNotes && typeof adminNotes === 'string') update.adminNotes = adminNotes.substring(0, 2000);
     if (status === 'completed') update.completedAt = new Date();
 
     const application = await Application.findOneAndUpdate(
@@ -160,7 +162,7 @@ exports.updateStatus = async (req, res) => {
 exports.sendRecommendation = async (req, res) => {
   try {
     const { recommendation } = req.body;
-    if (!recommendation || recommendation.trim().length < 10) {
+    if (!recommendation || typeof recommendation !== 'string' || recommendation.trim().length < 10) {
       return res.status(400).json({ success: false, message: 'Recommendation must be at least 10 characters.' });
     }
 

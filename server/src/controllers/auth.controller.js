@@ -1,4 +1,5 @@
 const User = require('../models/User.model');
+const Application = require('../models/Application.model');
 const { sendEmail } = require('../services/email.service');
 const { sendTokenResponse } = require('../middleware/auth.middleware');
 const { OAuth2Client } = require('google-auth-library');
@@ -14,11 +15,24 @@ const isAdminEmail = (email) => {
   return list.includes(email.toLowerCase());
 };
 
+const generateReferralCode = async (name) => {
+  const prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, '') || 'USR';
+  let code;
+  let isUnique = false;
+  while (!isUnique) {
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    code = `${prefix}${random}`;
+    const existingUser = await User.findOne({ referralCode: code });
+    if (!existingUser) isUnique = true;
+  }
+  return code;
+};
+
 
 // POST /api/auth/google – Google Login
 exports.googleLogin = async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, refCode } = req.body;
     
     // Verify Google Token
     const ticket = await googleClient.verifyIdToken({
@@ -48,6 +62,22 @@ exports.googleLogin = async (req, res) => {
       user.role = 'admin';
     }
 
+    if (!user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name);
+    }
+
+    // If an existing user logs in via a referral link, set referredBy IF they haven't paid yet
+    if (refCode && typeof refCode === 'string' && !user.referredBy) {
+      const referrer = await User.findOne({ referralCode: refCode });
+      // Ensure they don't refer themselves
+      if (referrer && referrer._id.toString() !== user._id.toString()) {
+        const paidApps = await Application.countDocuments({ userId: user._id, paymentStatus: 'paid' });
+        if (paidApps === 0) {
+          user.referredBy = referrer._id;
+        }
+      }
+    }
+
     user.isVerified = true;
     user.lastLogin = new Date();
     await user.save();
@@ -62,7 +92,7 @@ exports.googleLogin = async (req, res) => {
 // POST /api/auth/google-register – Complete Google Registration
 exports.googleRegister = async (req, res) => {
   try {
-    const { credential, rollNo, stream } = req.body;
+    const { credential, rollNo, stream, refCode } = req.body;
     
     // Verify Google Token again to strictly ensure authenticity
     const ticket = await googleClient.verifyIdToken({
@@ -77,6 +107,14 @@ exports.googleRegister = async (req, res) => {
       return res.status(400).json({ success: false, message: 'User already exists. Please login.' });
     }
 
+    let referredBy = null;
+    if (refCode && typeof refCode === 'string') {
+      const referrer = await User.findOne({ referralCode: refCode });
+      if (referrer) referredBy = referrer._id;
+    }
+
+    const referralCode = await generateReferralCode(name);
+
     user = new User({
       name,
       email,
@@ -84,6 +122,8 @@ exports.googleRegister = async (req, res) => {
       stream: stream || 'Science',
       rollNo: rollNo || '',
       role: isAdminEmail(email) ? 'admin' : 'user',
+      referralCode,
+      referredBy,
     });
 
     user.lastLogin = new Date();
@@ -114,6 +154,12 @@ exports.logout = (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-otp -password');
+    
+    if (user && !user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name);
+      await user.save();
+    }
+
     res.status(200).json({ success: true, user });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to fetch user data.' });
@@ -125,9 +171,9 @@ exports.updateProfile = async (req, res) => {
   try {
     const { name, rollNo, stream } = req.body;
     const allowedFields = {};
-    if (name) allowedFields.name = name.trim().substring(0, 60);
-    if (rollNo !== undefined) allowedFields.rollNo = rollNo.trim().substring(0, 20);
-    if (stream) allowedFields.stream = stream;
+    if (name && typeof name === 'string') allowedFields.name = name.trim().substring(0, 60);
+    if (rollNo !== undefined && typeof rollNo === 'string') allowedFields.rollNo = rollNo.trim().substring(0, 20);
+    if (stream && typeof stream === 'string') allowedFields.stream = stream;
 
     const user = await User.findByIdAndUpdate(req.user._id, allowedFields, {
       returnDocument: 'after',

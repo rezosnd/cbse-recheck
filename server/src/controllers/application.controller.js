@@ -1,5 +1,6 @@
 const Application = require('../models/Application.model');
 const Payment = require('../models/Payment.model');
+const User = require('../models/User.model');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { sendEmail } = require('../services/email.service');
@@ -22,6 +23,8 @@ exports.createApplication = async (req, res) => {
   try {
     const { subjects, reason, rollNo, stream, studentMobile } = req.body;
     const user = req.user;
+    
+    if (typeof reason !== 'string') return res.status(400).json({ success: false, message: 'Invalid reason' });
 
     if (!studentMobile || studentMobile.length < 10) {
       return res.status(400).json({ success: false, message: 'Valid mobile number is required.' });
@@ -104,7 +107,7 @@ exports.verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, applicationId } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !applicationId) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !applicationId || typeof applicationId !== 'string') {
       return res.status(400).json({ success: false, message: 'Missing payment verification data.' });
     }
 
@@ -140,6 +143,22 @@ exports.verifyPayment = async (req, res) => {
       { paymentId: razorpay_payment_id, signature: razorpay_signature, status: 'paid' }
     );
 
+    // Increment referral count if this is the first payment
+    const prevPaidCount = await Application.countDocuments({ 
+      userId: req.user._id, 
+      paymentStatus: 'paid',
+      _id: { $ne: applicationId }
+    });
+    
+    if (prevPaidCount === 0) {
+      const user = await User.findById(req.user._id);
+      if (user && user.referredBy) {
+        await User.findByIdAndUpdate(user.referredBy, {
+          $inc: { referralCount: 1 }
+        });
+      }
+    }
+
     // Send confirmation email
     const subjectNames = application.subjects.map(s => s.subject);
     sendEmail({
@@ -171,7 +190,7 @@ exports.getMyApplications = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const filter = { userId: req.user._id, isDeleted: false };
-    if (req.query.status) filter.status = req.query.status;
+    if (req.query.status) filter.status = String(req.query.status);
 
     const [applications, total] = await Promise.all([
       Application.find(filter)

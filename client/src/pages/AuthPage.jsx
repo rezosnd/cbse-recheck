@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,6 +19,8 @@ const AuthPage = () => {
   const [form, setForm] = useState({ rollNo: '', stream: 'Science' });
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref');
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
@@ -26,7 +28,8 @@ const AuthPage = () => {
       // First try to log in
       const res = await api.post('/auth/google', {
         credential: credentialResponse.credential,
-        clientId: credentialResponse.clientId
+        clientId: credentialResponse.clientId,
+        refCode
       });
 
       if (res.data.requireDetails) {
@@ -58,7 +61,8 @@ const AuthPage = () => {
       const payload = {
         credential: googleData.credential,
         rollNo: form.rollNo,
-        stream: form.stream
+        stream: form.stream,
+        refCode
       };
       
       const res = await api.post('/auth/google-register', payload);

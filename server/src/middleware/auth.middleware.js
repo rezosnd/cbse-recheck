@@ -85,6 +85,8 @@ const sendTokenResponse = (user, statusCode, res) => {
       stream: userObj.stream,
       role: userObj.role,
       isVerified: userObj.isVerified,
+      referralCode: userObj.referralCode,
+      referralCount: userObj.referralCount,
     },
   });
 };

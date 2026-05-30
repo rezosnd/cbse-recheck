@@ -6,7 +6,7 @@ import api from '../lib/api';
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
 import Footer from '../components/Footer';
-import { FiFileText, FiClock, FiCheckCircle, FiPlus, FiArrowRight, FiInbox, FiInfo } from 'react-icons/fi';
+import { FiFileText, FiClock, FiCheckCircle, FiPlus, FiArrowRight, FiInbox, FiInfo, FiCopy, FiGift } from 'react-icons/fi';
 import { format } from 'date-fns';
 
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
@@ -24,7 +24,7 @@ const StatCard = ({ icon: Icon, label, value, color, bg }) => (
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ total: 0, pending: 0, underReview: 0, completed: 0 });
+  const [stats, setStats] = useState({ total: 0, pending: 0, underReview: 0, completed: 0, hasPaidApplication: false });
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,10 @@ const Dashboard = () => {
           api.get('/applications/stats'),
           api.get('/applications?limit=5'),
         ]);
-        setStats(statsRes.data.stats);
+        setStats({
+          ...statsRes.data.stats,
+          hasPaidApplication: statsRes.data.recentPayments && statsRes.data.recentPayments.length > 0
+        });
         setApplications(appsRes.data.applications);
       } catch (err) {
         console.error('Dashboard fetch error:', err);
@@ -59,7 +62,7 @@ const Dashboard = () => {
       <main className="container-max max-w-6xl mx-auto navbar-padding pb-12 px-4 sm:px-6 md:px-8 flex-1">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-4 mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-1">
               Welcome back, {user?.name?.split(' ')[0]}
@@ -91,6 +94,64 @@ const Dashboard = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Referral Card */}
+        {stats.hasPaidApplication && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative mb-8 sm:mb-12">
+            <div className="relative w-full px-5 py-6 sm:px-8 sm:py-7 bg-white rounded-[20px] sm:rounded-[24px] border border-black shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row items-center justify-between gap-6 transform hover:-translate-y-1 transition-transform duration-300">
+              
+              {/* Paper clip */}
+              <div className="absolute -top-3.5 -left-1 transform -rotate-12 text-black/80">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                </svg>
+              </div>
+
+              <div className="text-center md:text-left flex-1 mt-2 sm:mt-0">
+                <h2 className="text-2xl sm:text-[28px] font-bold mb-3 text-gray-900 font-inter tracking-tight flex flex-col sm:flex-row items-center sm:items-baseline gap-1 sm:gap-2 justify-center md:justify-start">
+                  Invite friends for
+                  <span className="relative z-10 font-extrabold text-amber-950 font-caveat text-3xl sm:text-4xl pb-1 leading-none ml-1">
+                    cool rewards
+                    <svg className="absolute left-0 bottom-1 w-full h-[7px] text-yellow-400 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 9C30 9 70 3 99 7C70 8 30 7 2 5" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                </h2>
+                <p className="text-gray-600 text-[13px] sm:text-[14px] leading-relaxed max-w-lg mx-auto md:mx-0">
+                  Share your link with friends. You currently have <strong className="text-gray-900 font-bold underline decoration-yellow-400 decoration-2 underline-offset-2">{user?.referralCount || 0}</strong> successful referrals! Share with friends and on <strong className="text-black font-bold">5 successful payments</strong> you get a <strong className="text-black font-bold">100% refund!</strong>
+                </p>
+              </div>
+              
+              <div className="flex flex-col w-full md:w-auto shrink-0 gap-2 sm:gap-3">
+                <div className="text-[11px] sm:text-[12px] text-gray-500 font-bold uppercase tracking-widest text-center md:text-right">Your Referral Code</div>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 sm:px-6 sm:py-3.5 text-center font-mono font-bold text-[17px] tracking-[0.15em] text-gray-900 shadow-sm">
+                    {user?.referralCode || '----'}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (user?.referralCode) {
+                        navigator.clipboard.writeText(`${window.location.origin}/auth?ref=${user.referralCode}`);
+                        import('react-hot-toast').then(m => m.default.success('Referral link copied! 🚀'));
+                        import('canvas-confetti').then(confetti => {
+                          confetti.default({
+                            particleCount: 150,
+                            spread: 80,
+                            origin: { y: 0.6 },
+                            colors: ['#000000', '#facc15', '#3b82f6']
+                          });
+                        });
+                      }
+                    }}
+                    className="bg-black text-white rounded-xl px-6 py-3.5 font-bold text-[14px] sm:text-[15px] hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <FiCopy size={16} /> Copy Link
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Applications */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm border border-gray-100">

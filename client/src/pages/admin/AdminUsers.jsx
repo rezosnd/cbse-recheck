@@ -68,6 +68,8 @@ const AdminUsers = () => {
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider pl-8">Name</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Roll No</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Stream</th>
+                    <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider text-center">Code</th>
+                    <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider text-center">Referrals</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider">Joined</th>
                     <th className="px-6 py-4.5 text-[11px] font-bold uppercase tracking-wider text-right pr-8">Contact</th>
                   </tr>
@@ -91,6 +93,16 @@ const AdminUsers = () => {
                       </td>
                       <td className="px-6 py-4 text-[14px] font-semibold text-gray-500">
                         {user.stream || '-'}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="font-mono text-[12px] bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-bold">
+                          {user.referralCode || '-'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex items-center justify-center px-2 py-1 min-w-[28px] h-[24px] rounded-md text-[12px] font-bold ${user.referralCount > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {user.referralCount || 0}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-[13px] font-semibold text-gray-500">
                         {format(new Date(user.createdAt), 'MMM dd, yyyy')}

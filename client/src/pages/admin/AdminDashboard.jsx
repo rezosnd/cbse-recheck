@@ -71,7 +71,7 @@ const AdminDashboard = () => {
 
   if (loading) return <PageLoader />;
 
-  const { stats, recentApplications, recentPayments } = data;
+  const { stats, recentApplications, recentPayments, topReferrers } = data;
 
   const statCards = [
     { icon: FiFileText, label: 'Total Applications', value: stats.totalApplications, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -165,6 +165,30 @@ const AdminDashboard = () => {
           </div>
 
         </div>
+
+        {/* Top Referrers */}
+        {topReferrers && topReferrers.length > 0 && (
+          <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100 mt-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-8">Top Referrers</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {topReferrers.map((user, idx) => (
+                <div key={user._id} className="flex items-center gap-4 p-4 rounded-2xl border border-gray-50 bg-gray-50/30">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                    #{idx + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-[14px] text-gray-900 truncate">{user.name}</div>
+                    <div className="text-[12px] text-gray-500 truncate">{user.email}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[18px] font-bold text-gray-900">{user.referralCount}</div>
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase">Referrals</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Email Lists */}
         {data.emailLists && (
