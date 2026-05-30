@@ -231,10 +231,7 @@ const SubjectSearchSelect = ({ value, onChange }) => {
 };
 
 const calculatePrice = (count) => {
-  if (count === 1) return 59;
-  if (count === 2) return 99;
-  if (count >= 3) return 149;
-  return 0;
+  return 1; // Temporarily set to ₹1 for testing
 };
 
 const ApplicationForm = () => {

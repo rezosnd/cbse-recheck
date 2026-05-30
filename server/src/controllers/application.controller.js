@@ -12,10 +12,7 @@ const razorpay = new Razorpay({
 
 // Calculate price based on subject count
 const calculatePrice = (subjectCount) => {
-  if (subjectCount === 1) return 59;
-  if (subjectCount === 2) return 99;
-  if (subjectCount >= 3) return 149;
-  return 0;
+  return 1; // Temporarily set to ₹1 for testing
 };
 
 // POST /api/applications – Create application & Razorpay order
