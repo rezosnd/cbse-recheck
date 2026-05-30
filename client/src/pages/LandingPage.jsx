@@ -461,8 +461,8 @@ const Features = () => (
 
 const plans = [
   { subjects: 1, price: 59, originalPrice: 59, label: '1 Subject' },
-  { subjects: 2, price: 100, originalPrice: 100, label: '2 Subjects', popular: true },
-  { subjects: '3+', price: 150, originalPrice: 150, label: '3+ Subjects' },
+  { subjects: 2, price: 99, originalPrice: 99, label: '2 Subjects', popular: true },
+  { subjects: '3+', price: 149, originalPrice: 149, label: '3+ Subjects' },
 ];
 
 const Pricing = () => {
