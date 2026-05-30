@@ -231,7 +231,7 @@ const SubjectSearchSelect = ({ value, onChange }) => {
 };
 
 const calculatePrice = (count) => {
-  if (count === 1) return 60;
+  if (count === 1) return 59;
   if (count === 2) return 100;
   if (count >= 3) return 150;
   return 0;
