@@ -231,9 +231,24 @@ const SubjectSearchSelect = ({ value, onChange }) => {
 };
 
 const calculatePrice = (count) => {
-  if (count === 1) return 59;
-  if (count === 2) return 99;
-  if (count >= 3) return 149;
+  const now = new Date();
+  
+  const flashSaleStart = new Date('2026-06-01T04:30:00Z'); // 10:00 AM IST
+  const flashSaleEnd = new Date('2026-06-01T16:30:00Z'); // 10:00 PM IST
+  
+  // Flash sale active only on 1 June 2026 between 10 AM and 10 PM IST
+  const isFlashSaleActive = now >= flashSaleStart && now < flashSaleEnd;
+
+  if (isFlashSaleActive) {
+    if (count === 1) return 44;
+    if (count === 2) return 74;
+    if (count >= 3) return 114;
+  } else {
+    if (count === 1) return 59;
+    if (count === 2) return 99;
+    if (count >= 3) return 149;
+  }
+  
   return 0;
 };
 

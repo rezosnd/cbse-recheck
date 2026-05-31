@@ -20,7 +20,25 @@ const stagger = {
 };
 
 // --- Hero Section --------------------------------------------------------------
-const Hero = () => (
+const Hero = () => {
+  const [saleStatus, setSaleStatus] = useState('ENDED');
+
+  useEffect(() => {
+    const flashSaleStart = new Date('2026-06-01T04:30:00Z');
+    const flashSaleEnd = new Date('2026-06-01T16:30:00Z');
+    
+    const checkSale = () => {
+      const now = new Date();
+      if (now < flashSaleStart) setSaleStatus('UPCOMING');
+      else if (now >= flashSaleStart && now < flashSaleEnd) setSaleStatus('ACTIVE');
+      else setSaleStatus('ENDED');
+    };
+    checkSale();
+    const interval = setInterval(checkSale, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
   <section className="min-h-screen relative overflow-hidden pt-32 pb-20 flex items-center bg-[#F5F5F5]">
     <div className="container-max w-full">
       <div className="grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
@@ -73,10 +91,12 @@ const Hero = () => (
                   <span className="text-red-500/50 mx-2 pb-1 hidden sm:inline-block">•</span>
                   
                   {/* Sketched red marker stroke behind "price drop" */}
-                  <span className="relative z-10 mx-1 mt-1 sm:mt-0 px-2 py-0.5 font-extrabold text-white bg-red-600 rounded-md font-sans text-[12px] uppercase tracking-wider leading-none flex items-center gap-1 shadow-sm animate-pulse">
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    Price drop tomorrow (1 June) 10 AM - 10 PM
-                  </span>
+                  {saleStatus !== 'ENDED' && (
+                    <span className="relative z-10 mx-1 mt-1 sm:mt-0 px-2 py-0.5 font-extrabold text-white bg-red-600 rounded-md font-sans text-[12px] uppercase tracking-wider leading-none flex items-center gap-1 shadow-sm animate-pulse">
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      {saleStatus === 'ACTIVE' ? 'Price Drop LIVE! Ends 10 PM' : 'Price drop tomorrow (1 June) 10 AM - 10 PM'}
+                    </span>
+                  )}
                 </div>
               </div>
               
@@ -306,7 +326,8 @@ const Hero = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 // --- How It Works --------------------------------------------------------------
 const steps = [
@@ -474,41 +495,89 @@ const plans = [
 ];
 
 const Pricing = () => {
+  const [saleStatus, setSaleStatus] = useState('ENDED');
   const [timeLeft, setTimeLeft] = useState({ h: '00', m: '00', s: '00' });
   const [flashTimeLeft, setFlashTimeLeft] = useState({ h: '00', m: '00', s: '00' });
+  const [flashSaleText, setFlashSaleText] = useState("");
+  const [flashSaleSubText, setFlashSaleSubText] = useState("");
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       
-      // Existing midnight countdown
-      const tomorrow = new Date(now);
-      tomorrow.setHours(24, 0, 0, 0); // Next midnight
-      const diff = tomorrow - now;
+      const flashSaleStart = new Date('2026-06-01T04:30:00Z'); // 10:00 AM IST
+      const flashSaleEnd = new Date('2026-06-01T16:30:00Z'); // 10:00 PM IST
       
-      const h = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
-      const m = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
-      const s = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
-      setTimeLeft({ h, m, s });
+      let status = 'ENDED';
+      let targetTime = null;
+      let text = "";
+      let subText = "";
 
-      // Flash sale countdown (Tomorrow 10 AM)
-      const flashStart = new Date(now);
-      flashStart.setDate(flashStart.getDate() + 1);
-      flashStart.setHours(10, 0, 0, 0);
+      if (now < flashSaleStart) {
+        status = 'UPCOMING';
+        text = "Price drop tomorrow (1 June) 10 AM - 10 PM";
+        subText = "Sale begins in";
+        targetTime = flashSaleStart;
+      } else if (now >= flashSaleStart && now < flashSaleEnd) {
+        status = 'ACTIVE';
+        text = "SALE IS LIVE! Ends at 10 PM";
+        subText = "Sale ends in";
+        targetTime = flashSaleEnd;
+      } else {
+        status = 'ENDED';
+      }
+
+      setSaleStatus(status);
+      setFlashSaleText(text);
+      setFlashSaleSubText(subText);
       
-      let flashDiff = flashStart - now;
-      if (flashDiff < 0) flashDiff = 0;
-      
-      const fh = Math.floor((flashDiff / (1000 * 60 * 60))).toString().padStart(2, '0');
-      const fm = Math.floor((flashDiff / 1000 / 60) % 60).toString().padStart(2, '0');
-      const fs = Math.floor((flashDiff / 1000) % 60).toString().padStart(2, '0');
-      setFlashTimeLeft({ h: fh, m: fm, s: fs });
+      if (targetTime) {
+        let flashDiff = targetTime - now;
+        if (flashDiff < 0) flashDiff = 0;
+        
+        const fh = Math.floor((flashDiff / (1000 * 60 * 60))).toString().padStart(2, '0');
+        const fm = Math.floor((flashDiff / 1000 / 60) % 60).toString().padStart(2, '0');
+        const fs = Math.floor((flashDiff / 1000) % 60).toString().padStart(2, '0');
+        setFlashTimeLeft({ h: fh, m: fm, s: fs });
+      }
     };
 
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  if (saleStatus === 'ENDED') {
+    return (
+      <section id="pricing" className="py-32 bg-[#F5F5F5] relative">
+        <div className="container-max max-w-5xl px-4 md:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-gray-500 max-w-2xl mx-auto text-[15px]">Choose the number of subjects you want our experts to evaluate.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((p) => (
+              <div key={p.label} className={`bg-white rounded-[24px] p-8 border ${p.popular ? 'border-blue-500 shadow-xl relative transform md:-translate-y-4' : 'border-gray-100 shadow-sm'} transition-transform hover:-translate-y-2`}>
+                {p.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-full shadow-md">Top Pick</div>}
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{p.label}</h3>
+                <div className="text-4xl font-black text-gray-900 mb-6 font-inter">₹{p.originalPrice}</div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3 text-sm text-gray-600 font-medium"><FiCheckCircle className="text-green-500 shrink-0" size={18} /> Expert Evaluation</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-600 font-medium"><FiCheckCircle className="text-green-500 shrink-0" size={18} /> Detailed PDF Report</li>
+                  <li className="flex items-center gap-3 text-sm text-gray-600 font-medium"><FiCheckCircle className="text-green-500 shrink-0" size={18} /> 12-Hour Turnaround</li>
+                </ul>
+                <Link to="/auth" className={`block w-full py-3.5 rounded-full text-center text-sm font-bold transition-all no-underline ${p.popular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'}`}>
+                  Get Started
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const isFlashSaleActive = saleStatus === 'ACTIVE';
 
   return (
   <section id="pricing" className="py-32 bg-white relative overflow-hidden">
@@ -529,12 +598,12 @@ const Pricing = () => {
         }}
       >
         <div className="text-center mb-10 md:mb-16 relative z-10 mt-2 md:mt-4">
-          <div className="inline-flex items-center justify-center gap-2 mb-4 md:mb-6 bg-blue-50 px-3 md:px-5 py-1.5 md:py-2 border-2 border-blue-600 transform -rotate-2" style={{ borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px' }}>
+          <div className={`inline-flex items-center justify-center gap-2 mb-4 md:mb-6 px-3 md:px-5 py-1.5 md:py-2 border-2 transform -rotate-2 ${isFlashSaleActive ? 'bg-red-50 border-red-600' : 'bg-blue-50 border-blue-600'}`} style={{ borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px' }}>
             <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-blue-600"></span>
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isFlashSaleActive ? 'bg-red-400' : 'bg-blue-400'}`}></span>
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 ${isFlashSaleActive ? 'bg-red-600' : 'bg-blue-600'}`}></span>
             </span>
-            <span className="text-[11px] md:text-sm font-black text-blue-700 uppercase tracking-widest font-mono">Starts Tomorrow 10 AM - 10 PM</span>
+            <span className={`text-[11px] md:text-sm font-black uppercase tracking-widest font-mono ${isFlashSaleActive ? 'text-red-700' : 'text-blue-700'}`}>{flashSaleText}</span>
           </div>
           
           <h3 className="text-4xl sm:text-5xl md:text-7xl font-black text-gray-900 mb-6 relative inline-block z-10 transform rotate-1" style={{ fontFamily: 'Caveat' }}>
@@ -548,7 +617,7 @@ const Pricing = () => {
           
           {/* Hand-drawn Timer */}
           <div className="flex flex-col items-center justify-center gap-2 md:gap-3 mt-6 md:mt-8">
-            <div className="text-base md:text-lg font-black text-gray-600 uppercase tracking-wider" style={{ fontFamily: 'Caveat' }}>Sale begins in</div>
+            <div className="text-base md:text-lg font-black text-gray-600 uppercase tracking-wider" style={{ fontFamily: 'Caveat' }}>{flashSaleSubText}</div>
             <div className="flex items-center gap-2 md:gap-3 text-gray-900 font-black text-2xl md:text-3xl" style={{ fontFamily: 'Caveat' }}>
               <div className="flex flex-col items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-gray-900 transform -rotate-3" style={{ borderRadius: '15px 225px 15px 255px/255px 15px 225px 15px' }}><span className="leading-none text-2xl md:text-4xl">{flashTimeLeft.h}</span><span className="text-[10px] md:text-[12px] uppercase mt-0.5 md:mt-1 font-mono tracking-tight">Hrs</span></div>
               <span className="text-gray-400 -mt-2 md:-mt-4">:</span>
