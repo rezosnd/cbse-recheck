@@ -30,7 +30,7 @@ const RefundGuide = () => {
             <h3 className="text-2xl font-bold text-blue-900 mb-3">How to Get a Complete Refund?</h3>
             <p className="text-blue-800 leading-relaxed text-lg">
               Want your analysis for free? Participate in our Referral Program! 
-              When you refer <strong className="font-extrabold text-blue-900">5 friends</strong> and they complete a successful payment (for ₹44, ₹74, or ₹114 plans), you automatically get a <strong className="font-extrabold text-blue-900">100% full refund</strong> on your original purchase.
+              When you refer <strong className="font-extrabold text-blue-900">3 friends</strong> and they complete a successful payment (for ₹44, ₹74, or ₹114 plans), you automatically get a <strong className="font-extrabold text-blue-900">100% full refund</strong> on your original purchase.
             </p>
           </div>
 
@@ -67,7 +67,7 @@ const RefundGuide = () => {
                       </span>
                     </h2>
                     <p className="text-gray-600 text-[13px] sm:text-[14px] leading-relaxed max-w-lg mx-auto md:mx-0">
-                      Share your link with friends. You currently have <strong className="text-gray-900 font-bold underline decoration-yellow-400 decoration-2 underline-offset-2">0</strong> successful referrals! Share with friends and on <strong className="text-black font-bold">5 successful payments</strong> you get a <strong className="text-black font-bold">100% refund!</strong>
+                      Share your link with friends. You currently have <strong className="text-gray-900 font-bold underline decoration-yellow-400 decoration-2 underline-offset-2">0</strong> successful referrals! Share with friends and on <strong className="text-black font-bold">3 successful payments</strong> you get a <strong className="text-black font-bold">100% refund!</strong>
                     </p>
                   </div>
                   
@@ -118,7 +118,7 @@ const RefundGuide = () => {
                 <h4 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
                   <FiGift className="text-green-500" /> Get Your Refund!
                 </h4>
-                <p className="text-gray-600 mb-4">Once <strong className="text-black">5 friends</strong> successfully purchase any plan (₹44, ₹74, or ₹114), our system will automatically initiate a 100% refund to your original payment method!</p>
+                <p className="text-gray-600 mb-4">Once <strong className="text-black">3 friends</strong> successfully purchase any plan (₹44, ₹74, or ₹114), our system will automatically initiate a 100% refund to your original payment method!</p>
                 
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-4 mt-4 max-w-xl">
                   <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
@@ -126,7 +126,7 @@ const RefundGuide = () => {
                   </div>
                   <div>
                     <h5 className="font-bold text-green-900 text-lg">Refund Initiated</h5>
-                    <p className="text-green-700 text-sm font-medium">5/5 Referrals Completed. ₹74 will be credited to your account within 5-7 business days.</p>
+                    <p className="text-green-700 text-sm font-medium">3/3 Referrals Completed. ₹74 will be credited to your account within 5-7 business days.</p>
                   </div>
                 </div>
               </div>

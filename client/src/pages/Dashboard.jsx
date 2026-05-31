@@ -118,7 +118,7 @@ const Dashboard = () => {
                   </span>
                 </h2>
                 <p className="text-gray-600 text-[13px] sm:text-[14px] leading-relaxed max-w-lg mx-auto md:mx-0">
-                  Share your link with friends. You currently have <strong className="text-gray-900 font-bold underline decoration-yellow-400 decoration-2 underline-offset-2">{stats.referralCount !== undefined ? stats.referralCount : (user?.referralCount || 0)}</strong> successful referrals! Share with friends and on <strong className="text-black font-bold">5 successful payments</strong> you get a <strong className="text-black font-bold">100% refund!</strong>
+                  Share your link with friends. You currently have <strong className="text-gray-900 font-bold underline decoration-yellow-400 decoration-2 underline-offset-2">{stats.referralCount !== undefined ? stats.referralCount : (user?.referralCount || 0)}</strong> successful referrals! Share with friends and on <strong className="text-black font-bold">3 successful payments</strong> you get a <strong className="text-black font-bold">100% refund!</strong>
                 </p>
               </div>
               
