@@ -15,6 +15,7 @@ import ApplicationForm from './pages/ApplicationForm';
 import ApplicationDetail from './pages/ApplicationDetail';
 import Messages from './pages/Messages';
 import Timer from './pages/Timer';
+import RefundGuide from './pages/RefundGuide';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApplications from './pages/admin/AdminApplications';
 import AdminApplicationDetail from './pages/admin/AdminApplicationDetail';
@@ -62,6 +63,7 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/timer" element={<Timer />} />
+        <Route path="/refund-guide" element={<RefundGuide />} />
 
         {/* Protected Student Routes */}
         <Route element={<ProtectedRoute />}>

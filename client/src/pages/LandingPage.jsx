@@ -69,6 +69,14 @@ const Hero = () => (
                       <path d="M1 9C30 9 70 3 99 7C70 8 30 7 2 5" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
                     </svg>
                   </span>
+
+                  <span className="text-red-500/50 mx-2 pb-1 hidden sm:inline-block">•</span>
+                  
+                  {/* Sketched red marker stroke behind "price drop" */}
+                  <span className="relative z-10 mx-1 mt-1 sm:mt-0 px-2 py-0.5 font-extrabold text-white bg-red-600 rounded-md font-sans text-[12px] uppercase tracking-wider leading-none flex items-center gap-1 shadow-sm animate-pulse">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Price drop tomorrow (1 June) 10 AM - 10 PM
+                  </span>
                 </div>
               </div>
               
@@ -467,10 +475,13 @@ const plans = [
 
 const Pricing = () => {
   const [timeLeft, setTimeLeft] = useState({ h: '00', m: '00', s: '00' });
+  const [flashTimeLeft, setFlashTimeLeft] = useState({ h: '00', m: '00', s: '00' });
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
+      
+      // Existing midnight countdown
       const tomorrow = new Date(now);
       tomorrow.setHours(24, 0, 0, 0); // Next midnight
       const diff = tomorrow - now;
@@ -479,6 +490,19 @@ const Pricing = () => {
       const m = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
       const s = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
       setTimeLeft({ h, m, s });
+
+      // Flash sale countdown (Tomorrow 10 AM)
+      const flashStart = new Date(now);
+      flashStart.setDate(flashStart.getDate() + 1);
+      flashStart.setHours(10, 0, 0, 0);
+      
+      let flashDiff = flashStart - now;
+      if (flashDiff < 0) flashDiff = 0;
+      
+      const fh = Math.floor((flashDiff / (1000 * 60 * 60))).toString().padStart(2, '0');
+      const fm = Math.floor((flashDiff / 1000 / 60) % 60).toString().padStart(2, '0');
+      const fs = Math.floor((flashDiff / 1000) % 60).toString().padStart(2, '0');
+      setFlashTimeLeft({ h: fh, m: fm, s: fs });
     };
 
     updateTime();
@@ -487,25 +511,133 @@ const Pricing = () => {
   }, []);
 
   return (
-  <section id="pricing" className="py-32 bg-white relative">
-    <div className="container-max max-w-5xl">
-      <div className="text-center mb-24 mt-6">
-        <div className="relative inline-block mb-12">
-          <div className="absolute -inset-y-4 -inset-x-8 z-0">
-            {/* Hand-drawn red circle/ellipse */}
-            <svg className="w-full h-full text-red-500 opacity-90" viewBox="0 0 200 60" preserveAspectRatio="none" fill="none">
-              <path d="M100,5 C150,2 195,15 190,30 C185,45 140,58 100,55 C50,52 5,40 10,25 C15,10 60,8 100,5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="600" strokeDashoffset="0" />
-              <path d="M90,7 C140,4 190,17 185,32 C180,47 135,60 95,57 C45,54 0,42 5,27" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-red-400" />
+  <section id="pricing" className="py-32 bg-white relative overflow-hidden">
+    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="container-max max-w-5xl relative z-10">
+      {/* Cartoonish Sketched Flash Sale Announcement Banner */}
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="max-w-[92%] md:max-w-5xl mx-auto mb-20 md:mb-24 relative py-8 md:py-12 px-4 md:px-12 bg-white mt-8 md:mt-12 overflow-hidden sm:overflow-visible"
+        style={{ 
+          backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
+          backgroundSize: '24px 24px',
+          borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
+          border: '3px solid #1E293B',
+          boxShadow: '8px 8px 0px rgba(30,41,59,0.1)'
+        }}
+      >
+        <div className="text-center mb-10 md:mb-16 relative z-10 mt-2 md:mt-4">
+          <div className="inline-flex items-center justify-center gap-2 mb-4 md:mb-6 bg-blue-50 px-3 md:px-5 py-1.5 md:py-2 border-2 border-blue-600 transform -rotate-2" style={{ borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px' }}>
+            <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-blue-600"></span>
+            </span>
+            <span className="text-[11px] md:text-sm font-black text-blue-700 uppercase tracking-widest font-mono">Starts Tomorrow 10 AM - 10 PM</span>
+          </div>
+          
+          <h3 className="text-4xl sm:text-5xl md:text-7xl font-black text-gray-900 mb-6 relative inline-block z-10 transform rotate-1" style={{ fontFamily: 'Caveat' }}>
+            Massive Price Drop!
+            {/* Cartoon Highlights / underlines */}
+            <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full h-[14px] md:h-[20px] text-yellow-400 -z-10" viewBox="0 0 300 20" fill="none" preserveAspectRatio="none">
+              <path d="M5 15 Q 75 5, 150 15 T 290 10" stroke="currentColor" strokeWidth="8" strokeLinecap="round" opacity="0.6" />
+              <path d="M10 18 Q 80 8, 140 18 T 280 13" stroke="currentColor" strokeWidth="6" strokeLinecap="round" opacity="0.4" />
+            </svg>
+          </h3>
+          
+          {/* Hand-drawn Timer */}
+          <div className="flex flex-col items-center justify-center gap-2 md:gap-3 mt-6 md:mt-8">
+            <div className="text-base md:text-lg font-black text-gray-600 uppercase tracking-wider" style={{ fontFamily: 'Caveat' }}>Sale begins in</div>
+            <div className="flex items-center gap-2 md:gap-3 text-gray-900 font-black text-2xl md:text-3xl" style={{ fontFamily: 'Caveat' }}>
+              <div className="flex flex-col items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-gray-900 transform -rotate-3" style={{ borderRadius: '15px 225px 15px 255px/255px 15px 225px 15px' }}><span className="leading-none text-2xl md:text-4xl">{flashTimeLeft.h}</span><span className="text-[10px] md:text-[12px] uppercase mt-0.5 md:mt-1 font-mono tracking-tight">Hrs</span></div>
+              <span className="text-gray-400 -mt-2 md:-mt-4">:</span>
+              <div className="flex flex-col items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-gray-900 transform rotate-2" style={{ borderRadius: '225px 15px 255px 15px/15px 255px 15px 225px' }}><span className="leading-none text-2xl md:text-4xl">{flashTimeLeft.m}</span><span className="text-[10px] md:text-[12px] uppercase mt-0.5 md:mt-1 font-mono tracking-tight">Min</span></div>
+              <span className="text-gray-400 -mt-2 md:-mt-4">:</span>
+              <div className="flex flex-col items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-gray-900 transform -rotate-1" style={{ borderRadius: '15px 255px 15px 225px/225px 15px 255px 15px' }}><span className="leading-none text-2xl md:text-4xl">{flashTimeLeft.s}</span><span className="text-[10px] md:text-[12px] uppercase mt-0.5 md:mt-1 font-mono tracking-tight">Sec</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Steps / Prices Layout */}
+        <div className="relative mt-8 md:mt-12 pb-4 md:pb-8">
+          {/* Messy scribbled connecting line */}
+          <div className="absolute top-20 left-[10%] right-[10%] hidden md:block z-0">
+            <svg className="w-full h-12 text-blue-300" preserveAspectRatio="none" viewBox="0 0 200 20" fill="none">
+              <path d="M0,10 Q 20,-5 40,15 T 80,5 T 120,15 T 160,5 T 200,10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path d="M5,12 Q 25,0 45,12 T 85,8 T 125,12 T 165,8 T 195,12" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
             </svg>
           </div>
-          <span style={{ fontFamily: 'Caveat' }} className="relative z-10 text-4xl md:text-5xl font-extrabold text-red-600 tracking-wide rotate-[-3deg] inline-block transform origin-center">
-            Limited Time Offer!
-          </span>
-          <svg className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2 Q10 12 12 22 M7 15 Q12 22 17 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative z-10 max-w-5xl mx-auto px-1 md:px-2">
+            
+            {/* Price 1 */}
+            <motion.div whileHover={{ y: -5, rotate: -2 }} className="flex flex-col items-center text-center bg-white p-5 md:p-8 border-[3px] border-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_rgba(0,0,0,1)] relative transition-all duration-300" style={{ borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px' }}>
+              
+              <div className="relative w-28 h-28 md:w-36 md:h-36 flex flex-col items-center justify-center mb-4 md:mb-6">
+                {/* Perfect Hand-drawn Blue Circle */}
+                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-blue-600 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M49 8 C72 8 92 25 92 49 C92 72 72 92 49 92 C25 92 8 72 8 49 C8 25 25 8 49 8" />
+                  <path d="M45 14 C65 14 85 30 85 50 C85 70 65 86 45 86 C25 86 14 70 14 50" opacity="0.5" strokeWidth="2" />
+                  <path d="M30 30 C50 20 80 40 70 70" opacity="0.3" strokeWidth="1" />
+                </svg>
+                <div className="relative z-10 flex flex-col items-center">
+                  <span className="text-gray-500 font-black text-lg md:text-xl line-through decoration-red-500 decoration-2 md:decoration-[3px] transform -rotate-6" style={{ fontFamily: 'Caveat' }}>₹59</span>
+                  <span className="font-black text-5xl md:text-6xl text-gray-900 leading-none" style={{ fontFamily: 'Caveat' }}>₹44</span>
+                </div>
+              </div>
+              
+              <h4 className="text-2xl md:text-3xl font-black text-gray-900 mb-1 md:mb-2 transform rotate-1" style={{ fontFamily: 'Caveat' }}>1 Subject</h4>
+              <p className="text-gray-700 font-bold text-[13px] md:text-sm font-mono">Expert evaluation for a single subject at a discount.</p>
+            </motion.div>
+
+            {/* Price 2 - HOT */}
+            <motion.div whileHover={{ y: -5, rotate: 2 }} className="flex flex-col items-center text-center bg-[#fef08a] p-6 md:p-8 border-[3px] border-blue-700 shadow-[4px_4px_0px_rgba(29,78,216,1)] md:shadow-[6px_6px_0px_rgba(29,78,216,1)] relative transition-all duration-300 md:-translate-y-6" style={{ borderRadius: '15px 255px 15px 225px/225px 15px 255px 15px' }}>
+              
+              <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] md:text-sm font-black uppercase px-3 py-1.5 md:px-4 md:py-2 border-[3px] border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] md:shadow-[4px_4px_0px_rgba(0,0,0,1)] transform -rotate-6 z-20 whitespace-nowrap" style={{ fontFamily: 'Caveat', letterSpacing: '2px', borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px' }}>Top Pick!</div>
+              
+              <div className="relative w-32 h-32 md:w-40 md:h-40 flex flex-col items-center justify-center mb-4 md:mb-6 mt-3 md:mt-4">
+                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-blue-700 drop-shadow-md" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M49 8 C72 8 92 25 92 49 C92 72 72 92 49 92 C25 92 8 72 8 49 C8 25 25 8 49 8" />
+                  <path d="M45 14 C65 14 85 30 85 50 C85 70 65 86 45 86 C25 86 14 70 14 50" opacity="0.5" strokeWidth="2.5" />
+                  <path d="M35 30 C55 20 75 40 65 65" opacity="0.3" strokeWidth="1.5" />
+                  <path d="M15 50 C30 20 70 20 85 50" opacity="0.2" strokeWidth="1" />
+                </svg>
+                <div className="relative z-10 flex flex-col items-center">
+                  <span className="text-gray-600 font-black text-xl md:text-2xl line-through decoration-red-600 decoration-[3px] md:decoration-[4px] transform -rotate-3" style={{ fontFamily: 'Caveat' }}>₹99</span>
+                  <span className="font-black text-6xl md:text-7xl text-blue-800 leading-none transform rotate-2" style={{ fontFamily: 'Caveat' }}>₹74</span>
+                </div>
+              </div>
+              
+              <h4 className="text-2xl md:text-3xl font-black text-blue-900 mb-1 md:mb-2 transform -rotate-2" style={{ fontFamily: 'Caveat' }}>2 Subjects</h4>
+              <p className="text-blue-900 font-bold text-[13px] md:text-sm font-mono leading-tight">Highly recommended. Secure better analysis.</p>
+            </motion.div>
+
+            {/* Price 3 */}
+            <motion.div whileHover={{ y: -5, rotate: -2 }} className="flex flex-col items-center text-center bg-white p-5 md:p-8 border-[3px] border-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_rgba(0,0,0,1)] relative transition-all duration-300" style={{ borderRadius: '225px 15px 255px 15px/15px 255px 15px 225px' }}>
+              
+              <div className="relative w-28 h-28 md:w-36 md:h-36 flex flex-col items-center justify-center mb-4 md:mb-6">
+                <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-blue-600 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M49 8 C72 8 92 25 92 49 C92 72 72 92 49 92 C25 92 8 72 8 49 C8 25 25 8 49 8" />
+                  <path d="M45 14 C65 14 85 30 85 50 C85 70 65 86 45 86 C25 86 14 70 14 50" opacity="0.5" strokeWidth="2" />
+                  <path d="M30 30 C50 20 80 40 70 70" opacity="0.3" strokeWidth="1" />
+                </svg>
+                <div className="relative z-10 flex flex-col items-center">
+                  <span className="text-gray-500 font-black text-lg md:text-xl line-through decoration-red-500 decoration-2 md:decoration-[3px] transform rotate-3" style={{ fontFamily: 'Caveat' }}>₹149</span>
+                  <span className="font-black text-5xl md:text-6xl text-gray-900 leading-none transform -rotate-1" style={{ fontFamily: 'Caveat' }}>₹114</span>
+                </div>
+              </div>
+              
+              <h4 className="text-2xl md:text-3xl font-black text-gray-900 mb-1 md:mb-2 transform rotate-2" style={{ fontFamily: 'Caveat' }}>3+ Subjects</h4>
+              <p className="text-gray-700 font-bold text-[13px] md:text-sm font-mono">Best value. Maximize your chances for a flat rate.</p>
+            </motion.div>
+            
+          </div>
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Transparent Pricing</h2>
+      </motion.div>
+
+      <div className="text-center mb-16 mt-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Current Pricing</h2>
       </div>
       
       <div className="grid md:grid-cols-3 gap-6 items-center">

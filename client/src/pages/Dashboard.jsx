@@ -148,6 +148,9 @@ const Dashboard = () => {
                     <FiCopy size={16} /> Copy Link
                   </button>
                 </div>
+                <Link to="/refund-guide" className="text-[12px] sm:text-[13px] text-gray-500 font-semibold underline decoration-gray-300 hover:text-black hover:decoration-black transition-all text-center md:text-right w-full inline-block mt-2">
+                  How does the 100% refund work? View Guide
+                </Link>
               </div>
             </div>
           </motion.div>
