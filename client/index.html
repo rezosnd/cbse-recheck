@@ -81,125 +81,12 @@
         }
       }
     </script>
-  <style>
-    /* ── Compact Live-Count Chip ── */
-    .live-chip {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px 8px 10px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.06);
-      box-shadow: 0 4px 16px -4px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04);
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      animation: chip-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
-      animation-delay: 2s;
-      cursor: default;
-      user-select: none;
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1),
-                  opacity 0.4s cubic-bezier(0.4,0,0.2,1),
-                  filter 0.4s ease;
-    }
-    .live-chip--vanish {
-      transform: scale(0.6) translateX(30px) !important;
-      opacity: 0 !important;
-      filter: blur(8px) !important;
-      pointer-events: none !important;
-    }
 
-    /* Green dot */
-    .live-chip__dot {
-      position: relative;
-      width: 7px; height: 7px;
-      flex-shrink: 0;
-    }
-    .live-chip__dot::before,
-    .live-chip__dot::after {
-      content: ''; position: absolute; inset: 0; border-radius: 50%;
-    }
-    .live-chip__dot::before { background: #22c55e; z-index: 1; }
-    .live-chip__dot::after {
-      background: #22c55e;
-      animation: chip-ping 1.6s cubic-bezier(0,0,0.2,1) infinite;
-    }
-    @keyframes chip-ping {
-      0%   { transform: scale(1);   opacity: 0.55; }
-      75%  { transform: scale(2.2); opacity: 0; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    /* Count */
-    .live-chip__num {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #111827;
-      letter-spacing: -0.3px;
-      line-height: 1;
-    }
-    .live-chip__plus {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #9ca3af;
-      margin-left: -2px;
-    }
-    .live-chip__label {
-      font-size: 0.62rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #9ca3af;
-      line-height: 1;
-    }
-
-    /* Close × */
-    .live-chip__x {
-      background: none;
-      border: none;
-      color: #d1d5db;
-      font-size: 0.8rem;
-      cursor: pointer;
-      padding: 0;
-      line-height: 1;
-      margin-left: 2px;
-      transition: color 0.15s;
-    }
-    .live-chip__x:hover { color: #6b7280; }
-
-    @keyframes chip-in {
-      from { transform: translateY(40px) scale(0.85); opacity: 0; }
-      to   { transform: translateY(0) scale(1); opacity: 1; }
-    }
-  </style>
 </head>
 
 <body>
   <div id="root"></div>
 
-  <!-- Live-Count Chip -->
-  <div class="live-chip" id="live-chip">
-    <span class="live-chip__dot"></span>
-    <span class="live-chip__num" id="live-count">250</span><span class="live-chip__plus">+</span>
-    <span class="live-chip__label">live</span>
-    <button class="live-chip__x" aria-label="Close" onclick="closeLiveChip()">&#10005;</button>
-  </div>
-
-  <script>
-    function closeLiveChip() {
-      var el = document.getElementById('live-chip');
-      el.classList.add('live-chip--vanish');
-      setTimeout(function(){ el.style.display = 'none'; }, 450);
-    }
-    (function() {
-      var count = 250;
-      var el = document.getElementById('live-count');
-      setInterval(function() { count += 5; el.textContent = count; }, 3600000);
-    })();
-  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
