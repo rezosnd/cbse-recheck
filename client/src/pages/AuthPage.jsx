@@ -404,9 +404,14 @@ const AuthPage = () => {
   const refCode = searchParams.get('ref');
   const isAdminMode = searchParams.get('admin') === 'true';
 
-  if (!isAdminMode) {
+  // Check if current time is past cutoff (Tomorrow 10 AM IST)
+  const isPastDeadline = new Date() > new Date('2026-06-07T10:00:00+05:30');
+
+  if (isPastDeadline && !isAdminMode) {
     return <ThankYouView />;
   }
+
+  // Login page is now open to all users
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
@@ -488,7 +493,7 @@ const AuthPage = () => {
           {/* Form Header */}
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-bold text-gray-900 font-outfit tracking-tight mb-2">
-              {step === 1 ? 'Welcome Admin' : 'Complete Profile'}
+              {step === 1 ? (isAdminMode ? 'Welcome Admin' : 'Get Started') : 'Complete Profile'}
             </h2>
             <p className="text-[14px] text-gray-500 font-medium">
               {step === 1 ? 'Sign in securely with your Google account' : `Hi ${googleData?.name?.split(' ')[0] || ''}, almost done!`}
